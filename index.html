@@ -3,52 +3,143 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>BON VI Mercat | Bebidas en La Plata</title>
-  <meta name="description" content="BON VI Mercat: vinos, cervezas, gin, whisky, aperitivos, licores, champagnes y otras bebidas con catálogo actualizado y entregas programadas en La Plata.">
+  <title>BON VI Mercat | Bebidas y productos en La Plata</title>
+  <meta name="description" content="BON VI Mercat: bebidas, aceites y otros productos seleccionados con catálogo actualizado y entregas programadas en La Plata.">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://pepem87.github.io/bonvi-web/">
-  <meta property="og:title" content="BON VI Mercat | Bebidas en La Plata">
-  <meta property="og:description" content="Catálogo actualizado de bebidas y entregas programadas en La Plata.">
+  <meta property="og:title" content="BON VI Mercat | Bebidas y productos en La Plata">
+  <meta property="og:description" content="Bebidas, aceites y otros productos seleccionados con catálogo actualizado y entregas programadas en La Plata.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://pepem87.github.io/bonvi-web/">
-  <meta name="theme-color" content="#294a3c">
+  <meta name="theme-color" content="#183f33">
   <style>
-    :root{--green:#294a3c;--green2:#174432;--ivory:#f4f0e8;--paper:#fffdf8;--gold:#8a6c3f;--muted:#65726b;--line:#d8d1c4}
+    :root{
+      --green:#183f33;
+      --green-soft:#2f5f4e;
+      --ivory:#f5f0e6;
+      --paper:#fffdf8;
+      --gold:#b58a45;
+      --muted:#6f766f;
+      --line:#ded6c8;
+      --shadow:0 18px 45px rgba(24,63,51,.10);
+    }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(180deg,#f4f0e8,#ebe5da);color:#23352d}
-    main{max-width:980px;margin:0 auto;padding:34px 18px 54px}
-    .hero,.section{background:rgba(255,253,248,.97);border:1px solid var(--line);border-radius:24px;box-shadow:0 12px 30px rgba(35,53,45,.08)}
-    .hero{padding:34px;text-align:center}
-    .brand{font-family:Georgia,serif;font-size:2.1rem;letter-spacing:.14em;font-weight:800;color:var(--green)}
-    .tag{margin-top:8px;letter-spacing:.12em;text-transform:uppercase;color:#6b744f;font-size:.78rem;font-weight:700}
-    h1,h2,h3{font-family:Georgia,serif;color:var(--green)}
-    h1{font-size:2.35rem;margin:22px 0 10px}
-    h2{font-size:1.55rem;margin:0 0 10px}
-    h3{font-size:1.08rem;margin:0 0 6px}
-    p{line-height:1.65;margin:8px 0}
-    .lead{font-size:1.05rem;max-width:760px;margin:0 auto}
-    .actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:26px 0 6px}
-    a.button{display:inline-block;padding:14px 20px;border-radius:999px;text-decoration:none;font-weight:800}
-    a.primary{background:var(--green);color:var(--paper)}
-    a.secondary{border:1px solid var(--green);color:var(--green);background:var(--paper)}
-    .section{padding:26px;margin-top:18px}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
-    .cat{border:1px solid #ded7ca;background:#faf7f0;border-radius:18px;padding:16px}
-    .cat span{font-size:1.45rem;display:block;margin-bottom:7px}
-    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
-    .step{padding:15px;border-left:4px solid var(--green);background:#faf7f0;border-radius:12px}
-    .faq details{border-top:1px solid #ded7ca;padding:14px 0}
-    .faq details:first-child{border-top:0}
-    .faq summary{cursor:pointer;font-weight:800;color:var(--green)}
-    .small{font-size:.86rem;color:var(--muted)}
-    .footer{text-align:center;margin-top:20px;color:var(--muted);font-size:.84rem}
-    @media(max-width:760px){
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:
+        radial-gradient(circle at top left,rgba(181,138,69,.08),transparent 30%),
+        linear-gradient(180deg,#f7f3eb 0%,#efe8dc 100%);
+      color:#22372f;
+    }
+    a{text-decoration:none}
+    .wrap{max-width:1120px;margin:0 auto;padding:24px 18px 56px}
+    .nav{
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      padding:14px 18px;
+      background:rgba(255,253,248,.86);
+      border:1px solid rgba(222,214,200,.95);
+      backdrop-filter:blur(10px);
+      border-radius:18px;
+      position:sticky;top:14px;z-index:20;
+      box-shadow:0 8px 30px rgba(24,63,51,.07);
+    }
+    .brand-wrap{display:flex;align-items:center;gap:10px}
+    .mark{
+      width:38px;height:38px;border-radius:50%;
+      display:grid;place-items:center;
+      background:var(--green);color:#fff;font-family:Georgia,serif;font-weight:800;
+      letter-spacing:.05em;
+    }
+    .brand{font-family:Georgia,serif;font-weight:800;letter-spacing:.08em;color:var(--green)}
+    .navlinks{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+    .navlinks a{color:var(--green);font-size:.92rem;font-weight:700}
+    .hero{
+      margin-top:18px;
+      background:linear-gradient(135deg,rgba(24,63,51,.98),rgba(47,95,78,.95));
+      color:#fff;
+      border-radius:30px;
+      padding:58px 42px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;right:-70px;top:-70px;width:260px;height:260px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow:0 0 0 32px rgba(255,255,255,.03),0 0 0 64px rgba(255,255,255,.02);
+    }
+    .eyebrow{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:#d8c19a;font-weight:800}
+    h1,h2,h3{font-family:Georgia,serif}
+    h1{font-size:3.4rem;line-height:1.02;margin:16px 0 16px;max-width:760px}
+    .hero p{max-width:760px;font-size:1.08rem;line-height:1.7;color:rgba(255,255,255,.88)}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+    .btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 20px;border-radius:999px;font-weight:800}
+    .btn.primary{background:#fff;color:var(--green)}
+    .btn.secondary{border:1px solid rgba(255,255,255,.35);color:#fff}
+    .section{margin-top:22px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:0 4px 12px}
+    .section-head h2{font-size:1.8rem;color:var(--green);margin:0}
+    .section-head p{margin:0;color:var(--muted);max-width:580px;line-height:1.5}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .card{
+      background:rgba(255,253,248,.95);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:22px;
+      box-shadow:0 10px 30px rgba(24,63,51,.06);
+      transition:.18s ease;
+    }
+    .card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(24,63,51,.09)}
+    .icon{
+      width:46px;height:46px;border-radius:14px;background:#eef2ec;
+      display:grid;place-items:center;font-size:1.35rem;margin-bottom:14px;
+    }
+    .card h3{margin:0 0 8px;color:var(--green);font-size:1.18rem}
+    .card p{margin:0;color:var(--muted);line-height:1.6}
+    .highlight{
+      display:grid;grid-template-columns:1.15fr .85fr;gap:16px;
+      background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)
+    }
+    .highlight h2{margin:0 0 10px;color:var(--green);font-size:1.8rem}
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .chip{background:#eef2ec;color:var(--green);padding:8px 11px;border-radius:999px;font-weight:700;font-size:.88rem}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .step{
+      background:rgba(255,253,248,.96);border:1px solid var(--line);border-radius:20px;padding:20px;
+    }
+    .num{width:34px;height:34px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800;margin-bottom:12px}
+    .faq{background:rgba(255,253,248,.96);border:1px solid var(--line);border-radius:22px;padding:18px 22px}
+    details{padding:14px 0;border-top:1px solid #e7dfd2}
+    details:first-of-type{border-top:0}
+    summary{cursor:pointer;font-weight:800;color:var(--green)}
+    details p{color:var(--muted);line-height:1.6}
+    .cta{
+      margin-top:22px;padding:30px;border-radius:26px;background:#e7eee9;border:1px solid #d7e0da;
+      display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap
+    }
+    .cta h2{margin:0;color:var(--green);font-size:1.7rem}
+    .cta p{margin:6px 0 0;color:var(--muted)}
+    .cta .btn.primary{background:var(--green);color:#fff}
+    footer{text-align:center;color:var(--muted);font-size:.84rem;padding-top:26px}
+    @media(max-width:860px){
+      .grid,.steps{grid-template-columns:1fr 1fr}
+      .highlight{grid-template-columns:1fr}
+      h1{font-size:2.7rem}
+    }
+    @media(max-width:620px){
+      .wrap{padding:14px 12px 36px}
+      .nav{position:static}
+      .navlinks{display:none}
+      .hero{padding:38px 22px;border-radius:24px}
+      h1{font-size:2.2rem}
       .grid,.steps{grid-template-columns:1fr}
-      .hero{padding:25px 18px}
-      .brand{font-size:1.65rem}
-      h1{font-size:1.9rem}
+      .section-head{display:block}
+      .section-head p{margin-top:6px}
       .actions{flex-direction:column}
-      a.button{text-align:center;width:100%}
+      .btn{width:100%}
     }
   </style>
   <script type="application/ld+json">
@@ -61,7 +152,7 @@
         "name":"BON VI Mercat",
         "url":"https://pepem87.github.io/bonvi-web/",
         "areaServed":"La Plata, Buenos Aires, Argentina",
-        "description":"Distribuidora de bebidas con catálogo actualizado y entregas programadas en La Plata.",
+        "description":"Distribuidora de bebidas y productos seleccionados con catálogo actualizado y entregas programadas en La Plata.",
         "sameAs":["https://www.instagram.com/bonvimercat/"]
       },
       {
@@ -71,84 +162,106 @@
         "name":"BON VI Mercat",
         "publisher":{"@id":"https://pepem87.github.io/bonvi-web/#organization"},
         "inLanguage":"es-AR"
-      },
-      {
-        "@type":"FAQPage",
-        "mainEntity":[
-          {
-            "@type":"Question",
-            "name":"¿Qué bebidas vende BON VI Mercat?",
-            "acceptedAnswer":{"@type":"Answer","text":"El catálogo incluye vinos, cervezas, gin, whisky, aperitivos, licores, champagnes, jugos y otras bebidas."}
-          },
-          {
-            "@type":"Question",
-            "name":"¿BON VI Mercat entrega en La Plata?",
-            "acceptedAnswer":{"@type":"Answer","text":"Sí. BON VI Mercat trabaja principalmente a pedido y coordina entregas programadas en La Plata."}
-          },
-          {
-            "@type":"Question",
-            "name":"¿Cómo hago un pedido?",
-            "acceptedAnswer":{"@type":"Answer","text":"Podés consultar el catálogo actualizado y luego hacer el pedido por WhatsApp."}
-          }
-        ]
       }
     ]
   }
   </script>
 </head>
 <body>
-<main>
+<div class="wrap">
+  <nav class="nav">
+    <div class="brand-wrap">
+      <div class="mark">BV</div>
+      <div class="brand">BON VI MERCAT</div>
+    </div>
+    <div class="navlinks">
+      <a href="#categorias">Categorías</a>
+      <a href="#como-comprar">Cómo comprar</a>
+      <a href="#faq">Preguntas</a>
+    </div>
+  </nav>
+
   <section class="hero">
-    <div class="brand">BON VI MERCAT</div>
-    <div class="tag">Buenas bebidas · mejores encuentros</div>
-    <h1>Bebidas en La Plata</h1>
-    <p class="lead">Consultá nuestro catálogo actualizado de <strong>vinos, cervezas, gin, whisky, aperitivos, licores, champagnes, jugos y otras bebidas</strong>. Trabajamos principalmente a pedido y coordinamos entregas programadas en La Plata.</p>
+    <div class="eyebrow">La Plata · catálogo actualizado</div>
+    <h1>Bebidas y productos seleccionados, en un solo lugar.</h1>
+    <p>En BON VI Mercat encontrás bebidas, aceites y otros productos para tu casa, reuniones y momentos especiales. Trabajamos principalmente a pedido y coordinamos entregas programadas en La Plata.</p>
     <div class="actions">
-      <a class="button primary" href="https://bonvi-mercat-6qpnhhbkm35bv8pcrywzmq.streamlit.app/Catalogo_publico">Ver catálogo actualizado</a>
-      <a class="button secondary" href="https://wa.me/5492216816892">Hacer pedido por WhatsApp</a>
+      <a class="btn primary" href="https://bonvi-mercat-6qpnhhbkm35bv8pcrywzmq.streamlit.app/Catalogo_publico">Ver catálogo</a>
+      <a class="btn secondary" href="https://wa.me/5492216816892">Pedir por WhatsApp</a>
     </div>
   </section>
 
-  <section class="section">
-    <h2>Distribuidora de bebidas en La Plata</h2>
-    <p>En BON VI Mercat podés consultar precios, presentaciones y disponibilidad desde un catálogo online. La propuesta está pensada para comprar de forma simple, comparar opciones y coordinar el pedido por WhatsApp.</p>
+  <section class="section" id="categorias">
+    <div class="section-head">
+      <div><h2>Qué podés encontrar</h2></div>
+      <p>No somos sólo bebidas. El catálogo también incluye aceites y otros productos seleccionados que vamos incorporando según disponibilidad.</p>
+    </div>
     <div class="grid">
-      <div class="cat"><span>🍷</span><h3>Vinos y champagnes</h3><p>Opciones para comidas, reuniones, regalos y celebraciones.</p></div>
-      <div class="cat"><span>🍺</span><h3>Cervezas</h3><p>Alternativas para tener frías en casa, juntadas y eventos.</p></div>
-      <div class="cat"><span>🌿</span><h3>Gin</h3><p>Marcas y presentaciones para tragos y consumo personal.</p></div>
-      <div class="cat"><span>🥃</span><h3>Whisky</h3><p>Distintas opciones para elegir según gusto y presupuesto.</p></div>
-      <div class="cat"><span>🍸</span><h3>Aperitivos y licores</h3><p>Productos para tragos, sobremesas y encuentros.</p></div>
-      <div class="cat"><span>🧃</span><h3>Sin alcohol y otros</h3><p>Jugos, bebidas sin alcohol y productos complementarios.</p></div>
+      <div class="card"><div class="icon">🍷</div><h3>Vinos y champagnes</h3><p>Opciones para comidas, encuentros, regalos y celebraciones.</p></div>
+      <div class="card"><div class="icon">🍺</div><h3>Cervezas</h3><p>Alternativas para juntadas, eventos y consumo personal.</p></div>
+      <div class="card"><div class="icon">🌿</div><h3>Gin, whisky y aperitivos</h3><p>Destilados, aperitivos y licores para tragos, sobremesas y ocasiones especiales.</p></div>
+      <div class="card"><div class="icon">🫒</div><h3>Aceites</h3><p>Aceites de oliva y otros productos de despensa seleccionados.</p></div>
+      <div class="card"><div class="icon">🧴</div><h3>Repelentes y cuidado</h3><p>Productos como OFF y otros artículos útiles para el hogar y uso personal.</p></div>
+      <div class="card"><div class="icon">🛍️</div><h3>Otros productos</h3><p>Vamos sumando nuevas categorías y oportunidades al catálogo según disponibilidad.</p></div>
     </div>
   </section>
 
   <section class="section">
-    <h2>Cómo comprar en BON VI</h2>
+    <div class="highlight">
+      <div>
+        <h2>Compra simple, sin vueltas</h2>
+        <p>Consultás el catálogo, comparás opciones y coordinás todo por WhatsApp. Así podés ver precios y presentaciones antes de hacer tu pedido.</p>
+        <div class="chips">
+          <span class="chip">La Plata</span>
+          <span class="chip">Catálogo online</span>
+          <span class="chip">Entrega programada</span>
+          <span class="chip">Pedidos por WhatsApp</span>
+        </div>
+      </div>
+      <div>
+        <h2>Buscá por categoría</h2>
+        <p>El catálogo permite encontrar productos por marca, nombre, código o tipo. Ideal para resolver rápido qué llevar o qué reponer.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="como-comprar">
+    <div class="section-head">
+      <div><h2>Cómo comprar</h2></div>
+      <p>Un circuito corto para que la compra sea clara desde el principio.</p>
+    </div>
     <div class="steps">
-      <div class="step"><strong>1. Mirá el catálogo</strong><br><span class="small">Buscá por producto, marca, código o categoría.</span></div>
-      <div class="step"><strong>2. Elegí tus productos</strong><br><span class="small">Revisá precio, presentación y disponibilidad.</span></div>
-      <div class="step"><strong>3. Pedí por WhatsApp</strong><br><span class="small">Coordinamos tu pedido y la entrega programada en La Plata.</span></div>
+      <div class="step"><div class="num">1</div><strong>Mirá el catálogo</strong><p class="small">Buscá bebidas, aceites u otros productos por categoría, marca o código.</p></div>
+      <div class="step"><div class="num">2</div><strong>Elegí lo que necesitás</strong><p class="small">Revisá precio, presentación y disponibilidad vigente.</p></div>
+      <div class="step"><div class="num">3</div><strong>Escribinos por WhatsApp</strong><p class="small">Coordinamos el pedido y la entrega programada en La Plata.</p></div>
     </div>
   </section>
 
-  <section class="section faq">
-    <h2>Preguntas frecuentes</h2>
-    <details><summary>¿Qué bebidas vende BON VI Mercat?</summary><p>Vinos, cervezas, gin, whisky, aperitivos, licores, champagnes, jugos y otras bebidas disponibles en el catálogo actualizado.</p></details>
-    <details><summary>¿Hacen entregas en La Plata?</summary><p>Sí. Trabajamos principalmente a pedido y coordinamos entregas programadas en La Plata.</p></details>
-    <details><summary>¿Cómo hago un pedido?</summary><p>Entrá al catálogo, elegí los productos que te interesan y escribinos por WhatsApp para coordinar el pedido.</p></details>
-    <details><summary>¿Los precios están actualizados?</summary><p>El catálogo público se mantiene actualizado. Los precios y la disponibilidad pueden cambiar, por eso conviene revisar el catálogo al momento de hacer el pedido.</p></details>
+  <section class="section" id="faq">
+    <div class="section-head">
+      <div><h2>Preguntas frecuentes</h2></div>
+      <p>La información más importante antes de hacer tu pedido.</p>
+    </div>
+    <div class="faq">
+      <details><summary>¿Qué vende BON VI Mercat?</summary><p>Vendemos bebidas, aceites y otros productos seleccionados. El catálogo puede incluir vinos, cervezas, gin, whisky, aperitivos, licores, champagnes, jugos, aceites, repelentes como OFF y otras categorías.</p></details>
+      <details><summary>¿Hacen entregas en La Plata?</summary><p>Sí. Trabajamos principalmente a pedido y coordinamos entregas programadas en La Plata.</p></details>
+      <details><summary>¿Cómo hago un pedido?</summary><p>Entrá al catálogo, elegí los productos que te interesan y escribinos por WhatsApp para coordinar el pedido.</p></details>
+      <details><summary>¿Los precios están actualizados?</summary><p>El catálogo público se mantiene actualizado. Los precios y la disponibilidad pueden cambiar, por eso conviene revisar el catálogo al momento de hacer el pedido.</p></details>
+    </div>
   </section>
 
-  <section class="section">
-    <h2>Encontrá bebidas en La Plata sin perder tiempo</h2>
-    <p>Si estás buscando vinos en La Plata, cerveza en La Plata, gin, whisky u otras bebidas, podés consultar todo desde un mismo catálogo y contactarnos directamente por WhatsApp.</p>
+  <section class="cta">
+    <div>
+      <h2>¿Querés ver qué hay disponible hoy?</h2>
+      <p>Abrí el catálogo actualizado de BON VI y encontrá bebidas, aceites y otros productos.</p>
+    </div>
     <div class="actions">
-      <a class="button primary" href="https://bonvi-mercat-6qpnhhbkm35bv8pcrywzmq.streamlit.app/Catalogo_publico">Abrir catálogo BON VI</a>
-      <a class="button secondary" href="https://www.instagram.com/bonvimercat/">Ver Instagram</a>
+      <a class="btn primary" href="https://bonvi-mercat-6qpnhhbkm35bv8pcrywzmq.streamlit.app/Catalogo_publico">Abrir catálogo</a>
+      <a class="btn secondary" style="color:var(--green);border-color:var(--green)" href="https://www.instagram.com/bonvimercat/">Instagram</a>
     </div>
   </section>
 
-  <div class="footer">BON VI Mercat · La Plata · Precios y disponibilidad sujetos a actualización · Prohibida su venta a menores de 18 años.</div>
-</main>
+  <footer>BON VI Mercat · La Plata · Precios y disponibilidad sujetos a actualización · Prohibida su venta a menores de 18 años.</footer>
+</div>
 </body>
 </html>
