@@ -57,20 +57,48 @@
     .navlinks a{color:var(--green);font-size:.92rem;font-weight:700}
     .hero{
       margin-top:18px;
-      background:linear-gradient(135deg,rgba(24,63,51,.98),rgba(47,95,78,.95));
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:26px;
+      align-items:center;
+      background:linear-gradient(135deg,rgba(24,63,51,.99),rgba(47,95,78,.96));
       color:#fff;
       border-radius:30px;
-      padding:58px 42px;
+      padding:48px 42px;
       box-shadow:var(--shadow);
       position:relative;
       overflow:hidden;
     }
     .hero:after{
       content:"";
-      position:absolute;right:-70px;top:-70px;width:260px;height:260px;border-radius:50%;
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 0 0 32px rgba(255,255,255,.03),0 0 0 64px rgba(255,255,255,.02);
+      position:absolute;right:-90px;top:-90px;width:310px;height:310px;border-radius:50%;
+      border:1px solid rgba(255,255,255,.11);
+      box-shadow:0 0 0 38px rgba(255,255,255,.025),0 0 0 76px rgba(255,255,255,.018);
     }
+    .hero-copy{position:relative;z-index:2}
+    .hero-showcase{
+      position:relative;z-index:2;
+      min-height:330px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+    .show-card{
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.09);
+      backdrop-filter:blur(8px);
+      border-radius:22px;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-height:150px;
+    }
+    .show-card:nth-child(2){transform:translateY(26px)}
+    .show-card:nth-child(3){transform:translateY(-8px)}
+    .show-icon{font-size:2rem}
+    .show-title{font-family:Georgia,serif;font-size:1.15rem;font-weight:800}
+    .show-sub{font-size:.82rem;color:rgba(255,255,255,.72);margin-top:4px}
     .eyebrow{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:#d8c19a;font-weight:800}
     h1,h2,h3{font-family:Georgia,serif}
     h1{font-size:3.4rem;line-height:1.02;margin:16px 0 16px;max-width:760px}
@@ -127,13 +155,18 @@
     @media(max-width:860px){
       .grid,.steps{grid-template-columns:1fr 1fr}
       .highlight{grid-template-columns:1fr}
+      .hero{grid-template-columns:1fr}
+      .hero-showcase{min-height:auto}
       h1{font-size:2.7rem}
     }
     @media(max-width:620px){
       .wrap{padding:14px 12px 36px}
       .nav{position:static}
       .navlinks{display:none}
-      .hero{padding:38px 22px;border-radius:24px}
+      .hero{padding:34px 20px;border-radius:24px}
+      .hero-showcase{grid-template-columns:1fr 1fr;gap:9px}
+      .show-card{padding:14px;min-height:120px}
+      .show-card:nth-child(2),.show-card:nth-child(3){transform:none}
       h1{font-size:2.2rem}
       .grid,.steps{grid-template-columns:1fr}
       .section-head{display:block}
@@ -182,12 +215,20 @@
   </nav>
 
   <section class="hero">
-    <div class="eyebrow">La Plata · catálogo actualizado</div>
-    <h1>Bebidas y productos seleccionados, en un solo lugar.</h1>
-    <p>En BON VI Mercat encontrás bebidas, aceites y otros productos para tu casa, reuniones y momentos especiales. Trabajamos principalmente a pedido y coordinamos entregas programadas en La Plata.</p>
-    <div class="actions">
-      <a class="btn primary" href="https://bonvi-mercat-6qpnhhbkm35bv8pcrywzmq.streamlit.app/Catalogo_publico">Ver catálogo</a>
-      <a class="btn secondary" href="https://wa.me/5492216816892">Pedir por WhatsApp</a>
+    <div class="hero-copy">
+      <div class="eyebrow">La Plata · catálogo actualizado</div>
+      <h1>Bebidas y productos seleccionados, en un solo lugar.</h1>
+      <p>En BON VI Mercat encontrás bebidas, aceites, repelentes y otros productos para tu casa, reuniones y momentos especiales. Trabajamos principalmente a pedido y coordinamos entregas programadas en La Plata.</p>
+      <div class="actions">
+        <a class="btn primary" href="https://bonvi-mercat-6qpnhhbkm35bv8pcrywzmq.streamlit.app/Catalogo_publico">Ver catálogo</a>
+        <a class="btn secondary" href="https://wa.me/5492216816892">Pedir por WhatsApp</a>
+      </div>
+    </div>
+    <div class="hero-showcase" aria-label="Categorías BON VI">
+      <div class="show-card"><div class="show-icon">🍷</div><div><div class="show-title">Bebidas</div><div class="show-sub">Vinos, cervezas, gin, whisky y más.</div></div></div>
+      <div class="show-card"><div class="show-icon">🫒</div><div><div class="show-title">Aceites</div><div class="show-sub">Oliva y productos de despensa.</div></div></div>
+      <div class="show-card"><div class="show-icon">🧴</div><div><div class="show-title">Cuidado</div><div class="show-sub">Repelentes como OFF y otros útiles.</div></div></div>
+      <div class="show-card"><div class="show-icon">🛍️</div><div><div class="show-title">Oportunidades</div><div class="show-sub">Nuevos productos según disponibilidad.</div></div></div>
     </div>
   </section>
 
