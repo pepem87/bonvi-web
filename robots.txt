@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pepem87.github.io/bonvi-web/sitemap.xml
