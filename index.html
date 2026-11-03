@@ -154,7 +154,10 @@
     .section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:0 4px 13px}
     .section-head h2{font-size:1.9rem;color:var(--green);margin:0}
     .section-head p{margin:0;color:var(--muted);max-width:620px;line-height:1.5}
-    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}
+    .grid>.card{grid-column:span 2}
+    .grid>.card:nth-child(4){grid-column:2 / span 2}
+    .grid>.card:nth-child(5){grid-column:4 / span 2}
     .card{
       background:rgba(255,250,241,.96);
       border:1px solid var(--line);
@@ -235,7 +238,9 @@
     @media(max-width:920px){
       .hero{grid-template-columns:1fr;min-height:auto}
       .hero-art{min-height:330px}
-      .grid{grid-template-columns:1fr 1fr}
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .grid>.card,.grid>.card:nth-child(4),.grid>.card:nth-child(5){grid-column:auto}
+      .grid>.card:last-child:nth-child(odd){grid-column:1 / -1}
       h1{font-size:2.8rem}
     }
     @media(max-width:620px){
@@ -245,6 +250,7 @@
       .hero{padding:36px 20px;border-radius:24px}
       h1{font-size:2.2rem}
       .grid,.steps{grid-template-columns:1fr}
+      .grid>.card:last-child:nth-child(odd){grid-column:auto}
       .section-head{display:block}
       .section-head p{margin-top:6px}
       .actions{flex-direction:column}
