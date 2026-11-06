@@ -153,7 +153,8 @@ def main():
     with tempfile.TemporaryDirectory(prefix="bonvi-private-") as tmp:
         write_preview(adapted, tmp, pdf_path="catalogo-personas.pdf",
                       search_aliases=rules["SEARCH_CATEGORY_ALIASES"],
-                      category_icons=category_icons)
+                      category_icons=category_icons,
+                      vigencia_marker=vigencia)
         for relative, source in illustrations.items():
             dest = Path(tmp) / relative
             dest.parent.mkdir(parents=True, exist_ok=True)
