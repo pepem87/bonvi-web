@@ -4,6 +4,7 @@ No conecta a BD ni publica datos. Reutiliza la plantilla HTML de vista previa.
 import html
 import json
 import re
+from urllib.parse import urlsplit
 from pathlib import Path
 from catalogo_precios import public_offer
 from catalogo_preview import slug, format_price, make_page
@@ -12,6 +13,16 @@ CATEGORIES = ["VINOS", "CHAMPAGNES", "CERVEZAS", "JUGOS Y POLVOS", "WHISKYS",
               "APERITIVOS", "ACEITES", "OTROS"]
 WHATSAPP = "https://wa.me/5492216816892"
 INSTAGRAM = "https://www.instagram.com/bonvimercat/"
+
+def verified_image(item):
+    """Solo imagen explícitamente verificada para este SKU; nunca inferir por nombre."""
+    image = item.get("imagen_verificada") or ""
+    if not image:
+        return ""
+    parsed = urlsplit(str(image))
+    if parsed.scheme != "https" or not parsed.netloc or parsed.username or parsed.password:
+        raise ValueError("La imagen verificada debe ser HTTPS")
+    return str(image)
 
 def public_product(item):
     """Sólo campos comerciales permitidos, sin costos ni márgenes."""
@@ -23,6 +34,7 @@ def public_product(item):
             "tipo": offer["tipo"], "uxb": offer["cantidad"],
             "precio": float(offer["precio_total"]),
             "unitario": float(offer["precio_unitario_referencia"]),
+            "imagen": verified_image(item),
             "slug": slug(str(item["producto"])) + "-" + slug(str(item["codigo"]))}
 
 def index_html(products, pdf_path=None):
@@ -57,13 +69,13 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 .categories button{border:1px solid #aab7a9;border-radius:30px;background:white;padding:13px 5px;color:var(--green);cursor:pointer}
 .categories button[aria-pressed=true]{background:var(--green);color:white}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.product{background:#fffdf8;border:1px solid #ddd5c7;border-radius:15px;padding:18px}
-.product h2{font:700 21px Georgia,serif}.price{font:700 29px Georgia,serif;margin-top:12px}
+.product{background:#fffdf8;border:1px solid #ddd5c7;border-radius:15px;padding:13px;display:flex;gap:13px;align-items:center;min-width:0}.product-body{min-width:0;flex:1}.product-photo{width:92px;height:116px;flex:0 0 92px;border-radius:11px;background:#f2eee4;display:grid;place-items:center;overflow:hidden}.product-photo img{width:100%;height:100%;object-fit:contain}.product-photo .fallback{font:11px Georgia,serif;text-align:center;color:#71816f;padding:8px}.product h2{margin:6px 0 9px;line-height:1.2;overflow-wrap:anywhere}
+.product h2{font:700 17px Georgia,serif}.price{font:700 25px Georgia,serif;margin-top:8px}
 .unit,.muted{font-size:12px;color:#637064}.product a{color:var(--green)}
 .float{position:fixed;bottom:18px;right:14px;display:grid;gap:9px}.float a{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;color:white;box-shadow:0 3px 12px #0003}
 .wa{background:#218b5b}.ig{background:linear-gradient(135deg,#7844ba,#c83282,#e6a04e)}
 .float svg,nav svg,footer svg{width:24px;height:24px}.empty{text-align:center;color:#657369;padding:25px}
-@media(max-width:700px){.grid{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.categories{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.product-photo{width:86px;height:108px;flex-basis:86px}.product{padding:11px}.filters{grid-template-columns:1fr}.categories{grid-template-columns:repeat(2,1fr)}}
 </style></head><body>
 <header><a class="brand" href="/">BON VI MERCAT</a><nav><a aria-label="WhatsApp" href="https://wa.me/5492216816892">WhatsApp</a><a aria-label="Instagram" href="https://www.instagram.com/bonvimercat/">Instagram</a></nav></header>
 <main class="wrap"><section class="hero"><div class="muted">BUENAS BEBIDAS · MEJORES ENCUENTROS</div><h1>CATÁLOGO ACTUALIZADO</h1></section>
@@ -97,7 +109,7 @@ const render=()=>{
  let rows=started?products.filter(p=>(!q||norm(p.nombre+" "+p.codigo+" "+p.marca).includes(q))&&(!cat||(cat==="APERITIVOS"?["APERITIVOS","GIN"].includes(p.categoria):cat==="OTROS"?["CUIDADO PERSONAL Y HOGAR","VARIADOS"].includes(p.categoria):p.categoria===cat))&&(!brand||p.marca===brand)&&p[key]<=max):[];
  if(sort==="asc")rows.sort((a,b)=>a[key]-b[key]);if(sort==="desc")rows.sort((a,b)=>b[key]-a[key]);if(sort==="name")rows.sort((a,b)=>a.nombre.localeCompare(b.nombre));
  const visible=rows.slice(0,60);
- $("results").innerHTML=visible.map(p=>'<article class="product"><div class="muted">'+esc(p.categoria)+' · Cód. '+esc(p.codigo)+'</div><h2><a href="productos/'+encodeURIComponent(p.slug)+'/">'+esc(p.nombre)+'</a></h2><div class="muted">'+(p.tipo==="bulto"?'Venta por bulto · '+p.uxb+' unidades':'Venta por unidad')+'</div><div class="price">'+money(p.precio)+'</div>'+(p.tipo==="bulto"?'<div class="unit">Referencia: '+money(p.unitario)+' por unidad</div>':'')+'</article>').join("");
+ $("results").innerHTML=visible.map(p=>'<article class="product"><div class="product-photo">'+(p.imagen?'<img loading="lazy" alt="'+esc(p.nombre)+'" src="'+esc(p.imagen)+'" onerror="this.replaceWith(document.createTextNode(\'Imagen no disponible\'))">':'<span class="fallback">BON VI MERCAT<br>Imagen pendiente</span>')+'</div><div class="product-body"><div class="muted">'+esc(p.categoria)+' · Cód. '+esc(p.codigo)+'</div><h2><a href="productos/'+encodeURIComponent(p.slug)+'/">'+esc(p.nombre)+'</a></h2><div class="muted">'+(p.tipo==="bulto"?'Venta por bulto · '+p.uxb+' unidades':'Venta por unidad')+'</div><div class="price">'+money(p.precio)+'</div>'+(p.tipo==="bulto"?'<div class="unit">Referencia: '+money(p.unitario)+' por unidad</div>':'')+'</div></article>').join("");
  $("count").textContent=started?rows.length+" productos encontrados"+(rows.length>60?" · Mostrando los primeros 60":""):"Buscá o seleccioná una categoría para comenzar.";
  $("empty").hidden=!started||rows.length>0;
  document.querySelectorAll("[data-cat]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.cat===cat)));
