@@ -119,17 +119,45 @@ def main():
             raise ValueError(f"Imágenes con códigos desconocidos: {sorted(unknown)[:5]}")
         for row in adapted:
             row["imagen_verificada"] = mapping.get(str(row["codigo"]), "")
-    # Los metadatos públicos se construyen con las reglas de Streamlit.
+    # Los metadatos e ilustraciones salen de las reglas vigentes de Streamlit.
+    # Se copian solo assets gráficos aprobados: nunca se inventa una foto de SKU.
+    illustrations = {}
     for r in adapted:
         r["categoria"] = r["categoria_publica"]
         r["marca"] = r["marca_publica"]
         r["precio_persona_unit"] = r["precio_unitario"]
+        category = r["categoria_publica"]
+        product = rules["normalize_text"](r.get("producto") or "").upper()
+        name = ("acetos.webp" if category == "ACEITES" and
+                ("ACETO" in product or "VINAGRE" in product)
+                else rules["CATEGORY_PLACEHOLDERS"].get(category, ""))
+        source = original / "assets" / "category_placeholders" / Path(name).name if name else None
+        if not source or not source.is_file():
+            name = rules["FALLBACK_CATEGORY_PNG"].get(category, "")
+            source = original / "assets" / "categories" / Path(name).name if name else None
+        if source and source.is_file():
+            relative = "assets/" + source.parent.name + "/" + source.name
+            r["imagen_categoria"] = relative
+            illustrations[relative] = source
+    category_icons = {}
+    for category, name in rules["BUTTON_ICON_FILES"].items():
+        source = original / "assets" / "button_icons" / Path(name).name
+        if source.is_file():
+            relative = "assets/button_icons/" + source.name
+            category_icons[category] = relative
+            illustrations[relative] = source
     # Genera índice, fichas y PDF en la misma carpeta privada.
     # write_preview exige carpeta vacía: usar subdirectorio temporal.
     import tempfile
     import shutil
     with tempfile.TemporaryDirectory(prefix="bonvi-private-") as tmp:
-        write_preview(adapted, tmp, pdf_path="catalogo-personas.pdf")
+        write_preview(adapted, tmp, pdf_path="catalogo-personas.pdf",
+                      search_aliases=rules["SEARCH_CATEGORY_ALIASES"],
+                      category_icons=category_icons)
+        for relative, source in illustrations.items():
+            dest = Path(tmp) / relative
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, dest)
         for item in Path(tmp).iterdir():
             shutil.move(str(item), str(output / item.name))
     (output / "control-privado.json").write_text(
