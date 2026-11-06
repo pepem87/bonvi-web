@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+"""Generación PRIVADA desde Streamlit original y Supabase (solo SELECT).
+
+Uso desde checkout local con ambos repositorios:
+  DATABASE_URL=... python tools/generar_catalogo_integrado.py \
+    --streamlit-dir /ruta/Bonvi-Mercat/BON_VI_MERCAT_Proyecto_v7_3_ONLINE/BON_VI_MERCAT_REAL_v7_3_ONLINE \
+    --output /ruta/privada/vista-nueva
+
+No desplegar ni subir salida al repositorio sin revisión de precios y PDF.
+"""
+import argparse
+import json
+import os
+from pathlib import Path
+from puente_catalogo_streamlit import load_rules, adapt_rows, verify_against_original
+from catalogo_indice import write_preview
+
+SQL = """
+SELECT codigo, producto, familia, presentacion, uxb,
+       modalidad, precio_persona_unit, activo, rol, orden_l7
+FROM public.productos
+WHERE activo = 1
+  AND UPPER(COALESCE(rol,'')) NOT LIKE '%BLOQUEADO%'
+  AND COALESCE(precio_persona_unit,0) > 0
+ORDER BY COALESCE(orden_l7,999999), codigo
+"""
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--streamlit-dir", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+    original = Path(args.streamlit_dir).resolve()
+    output = Path(args.output).resolve()
+    if not original.is_dir():
+        parser.error("Falta el checkout del proyecto original")
+    if output.exists() and any(output.iterdir()):
+        parser.error("La carpeta de salida debe estar vacía")
+    if not os.environ.get("DATABASE_URL"):
+        parser.error("DATABASE_URL debe estar en el entorno privado")
+    if Path.cwd().resolve() in output.parents or original in output.parents:
+        parser.error("No generar datos dentro de los repositorios")
+    rules = load_rules(original)
+    import psycopg2
+    conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=12)
+    try:
+        conn.set_session(readonly=True, autocommit=False)
+        with conn.cursor() as cur:
+            cur.execute(SQL)
+            names = [c[0] for c in cur.description]
+            rows = [dict(zip(names, r)) for r in cur.fetchall()]
+            cur.execute("SELECT valor FROM public.parametros WHERE clave='vigencia_catalogo' LIMIT 1")
+            result = cur.fetchone()
+            vigencia = str(result[0]) if result else ""
+    finally:
+        conn.close()
+    report = verify_against_original(rows, rules)
+    if report["errores"]:
+        raise RuntimeError("No generar: " + "; ".join(report["errores"][:10]))
+    adapted = adapt_rows(rows, rules)
+    # El PDF se genera con la misma función y archivos del proyecto original.
+    import sys
+    sys.path.insert(0, str(original))
+    from pdf_catalogo import generate_catalog_pdf
+    pdf_rows = [
+        {**r, "precio_unitario": r["precio_unitario"]}
+        for r in adapted
+    ]
+    pdf = generate_catalog_pdf(
+        pdf_rows, "PERSONA", vigencia,
+        original / "assets" / "logo.png",
+        original / "assets",
+    )
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "catalogo-personas.pdf").write_bytes(pdf)
+    # Los metadatos públicos se construyen con las reglas de Streamlit.
+    for r in adapted:
+        r["categoria"] = r["categoria_publica"]
+        r["marca"] = r["marca_publica"]
+        r["precio_persona_unit"] = r["precio_unitario"]
+    # Genera índice, fichas y PDF en la misma carpeta privada.
+    # write_preview exige carpeta vacía: usar subdirectorio temporal.
+    import tempfile
+    import shutil
+    with tempfile.TemporaryDirectory(prefix="bonvi-private-") as tmp:
+        write_preview(adapted, tmp, pdf_path="catalogo-personas.pdf")
+        for item in Path(tmp).iterdir():
+            shutil.move(str(item), str(output / item.name))
+    (output / "control-privado.json").write_text(
+        json.dumps({"productos":len(adapted),"vigencia":vigencia,
+                    "errores":report["errores"],"pdf_bytes":len(pdf)},
+                   ensure_ascii=False,indent=2),encoding="utf-8")
+    print("Generación PRIVADA terminada:",len(adapted),"productos. Revisar antes de publicar.")
+
+if __name__ == "__main__":
+    main()
