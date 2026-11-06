@@ -31,7 +31,7 @@ def index_html(products, pdf_path=None):
     """
     data = json.dumps(products, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     if pdf_path:
-        if not re.fullmatch(r"[a-zA-Z0-9_./-]+\\.pdf", pdf_path) or pdf_path.startswith("/") or ".." in pdf_path:
+        if not re.fullmatch(r"[a-zA-Z0-9_./-]+\.pdf", pdf_path) or pdf_path.startswith("/") or ".." in pdf_path:
             raise ValueError("Ruta PDF no segura")
         pdf = '<a class="download" href="' + html.escape(pdf_path, quote=True) + '" download>Descargar catálogo PDF ↓</a>'
     else:
