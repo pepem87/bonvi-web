@@ -139,6 +139,18 @@ def main():
             relative = "assets/" + source.parent.name + "/" + source.name
             r["imagen_categoria"] = relative
             illustrations[relative] = source
+    # Fondo y logo del mismo catálogo de Streamlit: copias para la vista privada.
+    logo_path = None
+    background_path = None
+    for filename in ("logo_bon_vi_mercat.png", "web_mockup.png"):
+        source = original / "assets" / filename
+        if source.is_file():
+            relative = "assets/" + filename
+            illustrations[relative] = source
+            if filename.startswith("logo_"):
+                logo_path = relative
+            else:
+                background_path = relative
     category_icons = {}
     for category, name in rules["BUTTON_ICON_FILES"].items():
         source = original / "assets" / "button_icons" / Path(name).name
@@ -154,7 +166,8 @@ def main():
         write_preview(adapted, tmp, pdf_path="catalogo-personas.pdf",
                       search_aliases=rules["SEARCH_CATEGORY_ALIASES"],
                       category_icons=category_icons,
-                      vigencia_marker=vigencia)
+                      vigencia_marker=vigencia,
+                      logo_path=logo_path, background_path=background_path)
         for relative, source in illustrations.items():
             dest = Path(tmp) / relative
             dest.parent.mkdir(parents=True, exist_ok=True)
