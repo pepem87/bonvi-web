@@ -24,6 +24,14 @@ def verified_image(item):
         raise ValueError("La imagen verificada debe ser HTTPS")
     return str(image)
 
+def category_image(item):
+    """Ruta relativa a una ilustración aprobada, nunca una URL de producto inferida."""
+    name = str(item.get("imagen_categoria") or "")
+    if name and not re.fullmatch(r"assets/(?:category_placeholders|categories)/[a-z0-9_-]+\.(?:webp|png)", name):
+        raise ValueError("Ruta de ilustración de categoría inválida")
+    return name
+
+
 def public_product(item):
     """Sólo campos comerciales permitidos, sin costos ni márgenes."""
     offer = public_offer(item["modalidad"], item["uxb"], item["precio_persona_unit"])
@@ -35,14 +43,16 @@ def public_product(item):
             "precio": float(offer["precio_total"]),
             "unitario": float(offer["precio_unitario_referencia"]),
             "imagen": verified_image(item),
+            "imagen_categoria": category_image(item),
             "slug": slug(str(item["producto"])) + "-" + slug(str(item["codigo"]))}
 
-def index_html(products, pdf_path=None, search_aliases=None):
+def index_html(products, pdf_path=None, search_aliases=None, category_icons=None):
     """Genera un HTML estático con búsqueda, filtros, redes y acceso a PDF.
     pdf_path debe ser un archivo público revisado y versionado; nunca un enlace ficticio.
     """
     data = json.dumps(products, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     aliases = json.dumps(search_aliases or {}, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    chips = json.dumps(category_icons or {}, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     if pdf_path:
         if not re.fullmatch(r"[a-zA-Z0-9_./-]+\.pdf", pdf_path) or pdf_path.startswith("/") or ".." in pdf_path:
             raise ValueError("Ruta PDF no segura")
@@ -74,7 +84,8 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 .pager button:disabled{opacity:.45;cursor:default}
 .pager span{font-size:13px;color:#405e50;font-weight:800}
 .categories{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.categories button{border:1px solid #aab7a9;border-radius:30px;background:white;padding:13px 5px;color:var(--green);cursor:pointer}
+.categories button{border:1px solid #aab7a9;border-radius:30px;background:white;padding:8px 5px;color:var(--green);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;font-weight:800}
+.categories button img{display:block;width:38px;height:38px;object-fit:contain;border-radius:7px}
 .categories button[aria-pressed=true]{background:var(--green);color:white}
 .categories button:hover{border-color:#294a3c}
 .categories button:focus-visible,.pager button:focus-visible,.clear:focus-visible{outline:3px solid #b58b49;outline-offset:2px}
@@ -110,6 +121,7 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 <script>
 const products=__PRODUCTS__;
 const aliases=__ALIASES__;
+const chipIcons=__CHIPS__;
 const cats=["VINOS","CHAMPAGNES","CERVEZAS","JUGOS Y POLVOS","WHISKYS","APERITIVOS","ACEITES","OTROS"];
 const $=id=>document.getElementById(id);
 const norm=s=>String(s||"").normalize("NFD").split("").filter(c=>{const n=c.charCodeAt(0);return n<768||n>879}).join("").toLowerCase();
@@ -123,7 +135,7 @@ const perPage=80;
 let page=1, filtered=[],signature="";
 $("category").innerHTML='<option value="">TODAS LAS CATEGORÍAS</option>'+[...new Set(products.map(p=>p.categoria).filter(Boolean))].sort().map(c=>'<option value="'+esc(c)+'">'+esc(catName(c))+'</option>').join("")+'<option value="OTROS">OTROS</option>';
 $("brand").innerHTML='<option value="">TODAS LAS MARCAS</option>'+[...new Set(products.map(p=>p.marca).filter(Boolean))].sort().map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join("");
-$("categories").innerHTML=cats.map(c=>'<button type="button" data-cat="'+esc(c)+'" aria-pressed="false">'+esc(catName(c))+'</button>').join("");
+$("categories").innerHTML=cats.map(c=>'<button type="button" data-cat="'+esc(c)+'" aria-pressed="false">'+(chipIcons[c]?'<img loading="lazy" alt="" src="'+esc(chipIcons[c])+'">':"")+esc(catName(c))+'</button>').join("");
 $("bottomPDF").innerHTML=document.querySelector(".pdf .download")?document.querySelector(".pdf .download").outerHTML:"";
 const pager=(place,pages)=>{const target=$(place);if(pages<=1){target.innerHTML="";return}target.innerHTML='<button type="button" data-move="-1" '+(page===1?"disabled":"")+'>← ANTERIOR</button><span>Página '+page+' de '+pages+'</span><button type="button" data-move="1" '+(page===pages?"disabled":"")+'>SIGUIENTE →</button>';target.querySelectorAll("[data-move]").forEach(b=>b.addEventListener("click",()=>{page+=Number(b.dataset.move);paint();$("count").scrollIntoView({block:"center",behavior:"smooth"})}))};
 function paint(){
@@ -134,7 +146,7 @@ function paint(){
  const bulk=p.tipo==="bulto"&&Number(p.uxb)>1;
  const badge=bulk?"📦 VENTA POR BULTO · x"+p.uxb:"🍾 VENTA POR UNIDAD";
  const fallback='<span class="fallback">BON VI MERCAT<br>Imagen por verificar</span>';
- const photo=p.imagen?'<img loading="lazy" alt="'+esc(p.nombre)+'" src="'+esc(p.imagen)+'">':fallback;
+ const photo=p.imagen?'<img loading="lazy" alt="'+esc(p.nombre)+'" src="'+esc(p.imagen)+'">':p.imagen_categoria?'<img loading="lazy" alt="Ilustración de categoría '+esc(p.categoria)+'" src="'+esc(p.imagen_categoria)+'">':fallback;
  const reference=bulk?'<div class="unit">Referencia por unidad: '+money(p.unitario)+'</div>':"";
  return '<article class="product"><div class="product-photo">'+photo+'</div><div class="product-body"><div class="catname">'+esc(p.categoria)+'</div><h2><a href="productos/'+encodeURIComponent(p.slug)+'/">'+esc(p.nombre)+'</a></h2><div class="product-code">CÓDIGO '+esc(p.codigo)+'</div><div class="muted">'+(p.presentacion?'Presentación: '+esc(p.presentacion):"")+'</div><div class="sale-row"><span class="sale-badge'+(bulk?' bulk':'')+'">'+badge+'</span><div class="price-wrap"><div class="price-label">Precio '+(bulk?"bulto":"unidad")+'</div><div class="price">'+money(p.precio)+'</div>'+reference+'</div></div></div></article>';
  }).join("");
@@ -166,9 +178,9 @@ document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()
 ["search","category","brand","range","pricetype","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("clear").addEventListener("click",()=>{$("search").value="";$("category").value="";$("brand").value="";$("range").value="TODOS";$("pricetype").value="unitario";$("sort").value="default";render()});
 render();
-</script></body></html>""".replace("__PRODUCTS__", data).replace("__ALIASES__", aliases)
+</script></body></html>""".replace("__PRODUCTS__", data).replace("__ALIASES__", aliases).replace("__CHIPS__", chips)
 
-def write_preview(rows, destination, pdf_path=None, search_aliases=None):
+def write_preview(rows, destination, pdf_path=None, search_aliases=None, category_icons=None):
     """Crea índice y fichas. Destino privado, nunca carpeta pública."""
     out = Path(destination).resolve()
     if out.exists() and any(out.iterdir()):
@@ -177,7 +189,7 @@ def write_preview(rows, destination, pdf_path=None, search_aliases=None):
     if len({p["slug"] for p in products}) != len(products):
         raise ValueError("Códigos duplicados; no generar páginas")
     out.mkdir(parents=True, exist_ok=True)
-    (out / "index.html").write_text(index_html(products, pdf_path, search_aliases), encoding="utf-8")
+    (out / "index.html").write_text(index_html(products, pdf_path, search_aliases, category_icons), encoding="utf-8")
     for row, p in zip(rows, products):
         folder = out / "productos" / p["slug"]
         folder.mkdir(parents=True, exist_ok=True)
