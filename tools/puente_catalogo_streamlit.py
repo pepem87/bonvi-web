@@ -16,7 +16,8 @@ PAGE_FUNCS = {"normalize_text", "public_category", "public_brand",
               "matches_public_category", "price_filter_matches"}
 PAGE_CONSTANTS = {"CATEGORY_TITLES", "OTHER_PUBLIC_CATEGORIES",
                   "KNOWN_BRAND_PREFIXES", "PRICE_OPTIONS", "PRICE_BASIS_OPTIONS",
-                  "POPULAR_CATEGORIES", "SORT_OPTIONS", "SEARCH_CATEGORY_ALIASES"}
+                  "POPULAR_CATEGORIES", "SORT_OPTIONS", "SEARCH_CATEGORY_ALIASES",
+                  "CATEGORY_PLACEHOLDERS", "FALLBACK_CATEGORY_PNG", "BUTTON_ICON_FILES"}
 
 
 def _extract(source, functions, constants=frozenset()):
