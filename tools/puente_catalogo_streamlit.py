@@ -76,7 +76,7 @@ def adapt_rows(rows, rules):
         item["precio_mostrado"] = rules["displayed_sale_price"](item)
         result.append(item)
     return sorted(result, key=lambda x: (
-        float(x.get("orden_l7") or 999999), str(x.get("codigo") or "")))
+        float(999999 if x.get("orden_l7") is None else x["orden_l7"]), str(x.get("codigo") or "")))
 
 
 def export_private_json(rows, rules, destination):
@@ -101,3 +101,22 @@ def export_private_json(rows, rules, destination):
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(safe, ensure_ascii=False, indent=2), encoding="utf-8")
     return len(safe)
+
+def verify_against_original(rows, rules):
+    """Chequeos de invariantes antes de permitir una exportación pública."""
+    catalog = adapt_rows(rows, rules)
+    errors = []
+    seen = set()
+    for p in catalog:
+        code = str(p["codigo"])
+        if code in seen:
+            errors.append("Código repetido: " + code)
+        seen.add(code)
+        expected = rules["public_category"](p.get("familia"), p.get("producto"))
+        if p["categoria_publica"] != expected:
+            errors.append("Categoría divergente: " + code)
+        if p["precio_mostrado"] != rules["displayed_sale_price"](p):
+            errors.append("Precio divergente: " + code)
+        if float(p["precio_unitario"]) <= 0:
+            errors.append("Precio no positivo: " + code)
+    return {"productos": len(catalog), "errores": errors}
