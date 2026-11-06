@@ -15,6 +15,16 @@ from pathlib import Path
 from puente_catalogo_streamlit import load_rules, adapt_rows, verify_against_original
 from catalogo_indice import write_preview
 
+SQL_PDF = """
+SELECT codigo, producto, familia, presentacion, uxb,
+       modalidad, precio_persona_unit, activo, rol, orden_l7
+FROM public.productos
+WHERE activo = 1 AND UPPER(COALESCE(rol,'')) NOT LIKE '%BLOQUEADO%'
+ORDER BY COALESCE((SELECT MIN(p2.orden_l7) FROM public.productos p2
+                   WHERE p2.activo=1 AND COALESCE(p2.familia,'')=COALESCE(productos.familia,'')),999999),
+         COALESCE(orden_l7,999999), codigo
+"""
+
 SQL = """
 SELECT codigo, producto, familia, presentacion, uxb,
        modalidad, precio_persona_unit, activo, rol, orden_l7
@@ -52,6 +62,9 @@ def main():
             cur.execute("SELECT valor FROM public.parametros WHERE clave='vigencia_catalogo' LIMIT 1")
             result = cur.fetchone()
             vigencia = str(result[0]) if result else ""
+            cur.execute(SQL_PDF)
+            pdf_names = [c[0] for c in cur.description]
+            pdf_source_rows = [dict(zip(pdf_names, r)) for r in cur.fetchall()]
     finally:
         conn.close()
     report = verify_against_original(rows, rules)
@@ -62,13 +75,20 @@ def main():
     import sys
     sys.path.insert(0, str(original))
     from pdf_catalogo import generate_catalog_pdf
-    pdf_rows = [
-        {**r, "precio_unitario": r["precio_unitario"]}
-        for r in adapted
-    ]
+    # PDF original: conserva su propio orden por familia y precios cero.
+    pdf_rows = []
+    for r in pdf_source_rows:
+        item = dict(r)
+        fam = str(item.get("familia") or "").upper()
+        if "PEDI" in fam and "UNID" in fam:
+            item["modalidad"] = "UNIDAD"
+        item["precio_unitario"] = item.get("precio_persona_unit") or 0
+        pdf_rows.append(item)
     pdf = generate_catalog_pdf(
         pdf_rows, "PERSONA", vigencia,
-        original / "assets" / "logo.png",
+        next((p for p in [original / "assets" / name for name in
+              ("logo_bon_vi_mercat.png", "logo.png", "BON_VI_MERCAT.png",
+               "bon_vi_logo.png", "logo_bonvi.png")] if p.exists()), None),
         original / "assets",
     )
     output.mkdir(parents=True, exist_ok=True)
@@ -88,7 +108,7 @@ def main():
             shutil.move(str(item), str(output / item.name))
     (output / "control-privado.json").write_text(
         json.dumps({"productos":len(adapted),"vigencia":vigencia,
-                    "errores":report["errores"],"pdf_bytes":len(pdf)},
+                    "errores":report["errores"],"pdf_bytes":len(pdf),"pdf_productos":len(pdf_rows)},
                    ensure_ascii=False,indent=2),encoding="utf-8")
     print("Generación PRIVADA terminada:",len(adapted),"productos. Revisar antes de publicar.")
 
