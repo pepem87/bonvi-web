@@ -92,8 +92,8 @@ def main():
     parser.add_argument("--output", required=True, help="Directorio local PRIVADO de previsualización")
     parser.add_argument("--limit", type=int, default=20, help="Máximo de productos para prueba")
     args = parser.parse_args()
-    if args.limit < 1 or args.limit > 1000:
-        parser.error("--limit debe estar entre 1 y 1000")
+    if args.limit < 1 or args.limit > 2000:
+        parser.error("--limit debe estar entre 1 y 2000")
     if not os.getenv("DATABASE_URL"):
         parser.error("Falta DATABASE_URL; configurar solo en entorno privado")
     output = Path(args.output).resolve()
@@ -108,20 +108,13 @@ def main():
             cur.execute(QUERY)
             names = [col[0] for col in cur.description]
             rows = [dict(zip(names, row)) for row in cur.fetchmany(args.limit)]
-    output.mkdir(parents=True, exist_ok=True)
-    manifest = []
-    for item in rows:
-        item["slug"] = f"{slug(item['producto'])}-{item['codigo']}"
-        folder = output / "productos" / item["slug"]
-        folder.mkdir(parents=True, exist_ok=True)
-        (folder / "index.html").write_text(make_page(item), encoding="utf-8")
-        manifest.append({"codigo": item["codigo"], "slug": item["slug"],
-                         "nombre": item["producto"], "familia": item["familia"],
-                         "precio_referencia_unitario": float(item["precio_persona_unit"])})
+    from catalogo_indice import write_preview, public_product
+    count = write_preview(rows, output)
+    manifest = [public_product(item) for item in rows]
     (output / "manifest-preview.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"Previsualización privada generada: {len(manifest)} productos en {output}")
-    print("NO PUBLICAR: páginas noindex y precios/modalidades pendientes de validación.")
+    print(f"Previsualización privada: {count} productos y fichas en {output}")
+    print("NO PUBLICAR: índice noindex, PDF completo y categorías pendientes de validación.")
 
 if __name__ == "__main__":
     main()
