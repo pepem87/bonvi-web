@@ -8,8 +8,8 @@ from pathlib import Path
 from catalogo_precios import public_offer
 from catalogo_preview import slug, format_price, make_page
 
-CATEGORIES = ["Vinos", "Champagnes", "Cervezas", "Jugos", "Whiskys",
-              "Aperitivos", "Aceites y Acetos", "Otros"]
+CATEGORIES = ["VINOS", "CHAMPAGNES", "CERVEZAS", "JUGOS Y POLVOS", "WHISKYS",
+              "APERITIVOS", "ACEITES", "OTROS"]
 WHATSAPP = "https://wa.me/5492216816892"
 INSTAGRAM = "https://www.instagram.com/bonvimercat/"
 
@@ -83,18 +83,18 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 <footer><span>BON VI MERCAT · La Plata</span><span><a href="https://wa.me/5492216816892">WhatsApp</a> · <a href="https://www.instagram.com/bonvimercat/">Instagram</a></span></footer>
 <script>
 const products=__PRODUCTS__;
-const cats=["Vinos","Champagnes","Cervezas","Jugos","Whiskys","Aperitivos","Aceites y Acetos","Otros"];
+const cats=["VINOS","CHAMPAGNES","CERVEZAS","JUGOS Y POLVOS","WHISKYS","APERITIVOS","ACEITES","OTROS"];
 const $=id=>document.getElementById(id);
 const norm=s=>String(s||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase();
 const money=n=>"$ "+Math.round(n).toLocaleString("es-AR");
 const esc=s=>String(s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 $("category").innerHTML='<option value="">Todas</option>'+cats.map(x=>'<option>'+esc(x)+'</option>').join("");
 $("brand").innerHTML='<option value="">Todas</option>'+[...new Set(products.map(p=>p.marca).filter(Boolean))].sort().map(x=>'<option>'+esc(x)+'</option>').join("");
-$("categories").innerHTML=cats.map(c=>'<button type="button" data-cat="'+esc(c)+'" aria-pressed="false">'+esc(c)+'</button>').join("");
+$("categories").innerHTML=cats.map(c=>'<button type="button" data-cat="'+esc(c)+'" aria-pressed="false">'+esc(c==="ACEITES"?"ACEITES Y ACETOS":c==="JUGOS Y POLVOS"?"JUGOS":c)+'</button>').join("");
 const render=()=>{
  const q=norm($("search").value),cat=$("category").value,brand=$("brand").value,max=Number($("maxprice").value)||Infinity,key=$("pricetype").value,sort=$("sort").value;
  const started=!!(q||cat||brand||$("maxprice").value||sort!=="default");
- let rows=started?products.filter(p=>(!q||norm(p.nombre+" "+p.codigo+" "+p.marca).includes(q))&&(!cat||p.categoria===cat)&&(!brand||p.marca===brand)&&p[key]<=max):[];
+ let rows=started?products.filter(p=>(!q||norm(p.nombre+" "+p.codigo+" "+p.marca).includes(q))&&(!cat||(cat==="APERITIVOS"?["APERITIVOS","GIN"].includes(p.categoria):cat==="OTROS"?["CUIDADO PERSONAL Y HOGAR","VARIADOS"].includes(p.categoria):p.categoria===cat))&&(!brand||p.marca===brand)&&p[key]<=max):[];
  if(sort==="asc")rows.sort((a,b)=>a[key]-b[key]);if(sort==="desc")rows.sort((a,b)=>b[key]-a[key]);if(sort==="name")rows.sort((a,b)=>a.nombre.localeCompare(b.nombre));
  const visible=rows.slice(0,60);
  $("results").innerHTML=visible.map(p=>'<article class="product"><div class="muted">'+esc(p.categoria)+' · Cód. '+esc(p.codigo)+'</div><h2><a href="productos/'+encodeURIComponent(p.slug)+'/">'+esc(p.nombre)+'</a></h2><div class="muted">'+(p.tipo==="bulto"?'Venta por bulto · '+p.uxb+' unidades':'Venta por unidad')+'</div><div class="price">'+money(p.precio)+'</div>'+(p.tipo==="bulto"?'<div class="unit">Referencia: '+money(p.unitario)+' por unidad</div>':'')+'</article>').join("");
