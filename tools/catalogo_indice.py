@@ -47,7 +47,8 @@ def public_product(item):
             "imagen_categoria": category_image(item),
             "slug": slug(str(item["producto"])) + "-" + slug(str(item["codigo"]))}
 
-def index_html(products, pdf_path=None, search_aliases=None, category_icons=None, vigencia_marker=None):
+def index_html(products, pdf_path=None, search_aliases=None, category_icons=None,
+               vigencia_marker=None, logo_path=None, background_path=None):
     """Genera un HTML estático con búsqueda, filtros, redes y acceso a PDF.
     pdf_path debe ser un archivo público revisado y versionado; nunca un enlace ficticio.
     """
@@ -60,6 +61,11 @@ def index_html(products, pdf_path=None, search_aliases=None, category_icons=None
     except ValueError:
         pass
     hero_meta = (f"<strong>Vigente hasta {html.escape(date)}</strong> · " if date else "") + f"{len(products)} productos"
+    for name in (logo_path, background_path):
+        if name and not re.fullmatch(r"assets/[a-z0-9_-]+\.png", name):
+            raise ValueError("Ruta de recurso gráfico inválida")
+    logo = ('<img class="hero-logo" alt="BON VI MERCAT" src="' + html.escape(logo_path, quote=True) + '">' if logo_path else "")
+    background = ('linear-gradient(rgba(244,240,232,.86),rgba(244,240,232,.93)),url("'+background_path+'")' if background_path else "linear-gradient(180deg,#F4F0E8,#EAE4D8)")
     if pdf_path:
         if not re.fullmatch(r"[a-zA-Z0-9_./-]+\.pdf", pdf_path) or pdf_path.startswith("/") or ".." in pdf_path:
             raise ValueError("Ruta PDF no segura")
@@ -72,11 +78,12 @@ def index_html(products, pdf_path=None, search_aliases=None, category_icons=None
 <title>Catálogo BON VI MERCAT | Bebidas, aceites y acetos en La Plata</title>
 <style>
 :root{--green:#173d31;--ivory:#f5f0e6}*{box-sizing:border-box}
-body{margin:0;background:var(--ivory);color:var(--green);font:16px system-ui}
+body{margin:0;background:var(--ivory);background-image:__BACKGROUND__;background-position:center top;background-size:cover;background-attachment:fixed;color:var(--green);font:16px system-ui}
 header,footer{background:var(--green);color:white;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 header a,footer a{color:white;text-decoration:none}.brand{font:700 22px Georgia,serif;letter-spacing:2px}
 nav{display:flex;gap:16px}.wrap{max-width:840px;margin:auto;padding:20px 16px 70px}
-.hero{text-align:center;background:#fffaf3;border:1px solid #ddd5c7;border-radius:20px;padding:26px 15px}
+.hero{text-align:center;background:rgba(255,253,248,.96);border:1px solid rgba(41,74,60,.18);border-radius:24px;padding:20px 22px 18px;box-shadow:0 12px 34px rgba(41,74,60,.12)}
+.hero-logo{width:120px;max-width:34vw;height:auto;margin:0 auto 6px;display:block}
 h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 .hero-meta{font-size:14px;color:#536158}.hero-meta strong{color:#294a3c}
 .panel{background:#fffdf8;border:1px solid #ddd5c7;border-radius:17px;padding:19px;margin:16px 0}
@@ -111,7 +118,7 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 @media(max-width:700px){.product-photo{width:66px;min-height:104px}.product-photo img{height:104px}.product{padding:10px;grid-template-columns:66px minmax(0,1fr);gap:10px}.filters{grid-template-columns:1fr}.categories{grid-template-columns:repeat(2,1fr)}.searchrow{grid-template-columns:1fr}.sale-row{display:block}.price-wrap{text-align:left;margin:9px 0 0}.pager{flex-wrap:wrap}.pager span{order:-1;width:100%;text-align:center}}
 </style></head><body>
 <header><a class="brand" href="/">BON VI MERCAT</a><nav><a aria-label="WhatsApp" href="https://wa.me/5492216816892">WhatsApp</a><a aria-label="Instagram" href="https://www.instagram.com/bonvimercat/">Instagram</a></nav></header>
-<main class="wrap"><section class="hero"><div class="muted">BUENAS BEBIDAS · MEJORES ENCUENTROS</div><h1>CATÁLOGO ACTUALIZADO</h1><div class="hero-meta">__HERO_META__</div></section>
+<main class="wrap"><section class="hero">__LOGO__<div class="muted">BUENAS BEBIDAS · MEJORES ENCUENTROS</div><h1>CATÁLOGO ACTUALIZADO</h1><div class="hero-meta">__HERO_META__</div></section>
 <section class="panel pdf"><div><strong>¿Preferís la lista completa?</strong><div class="muted">Catálogo en PDF</div></div>""" + pdf + """</section>
 <section class="panel"><h2>¿Qué estás buscando?</h2><p class="muted">Buscá por código, marca o producto.</p>
 <div class="searchrow"><input id="search" type="search" aria-label="Buscar" placeholder="🔎 Código, Chandon, jugo, Fernet..."><button type="button" id="clear" class="clear">✕ Limpiar</button></div></section>
@@ -186,9 +193,10 @@ document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()
 ["search","category","brand","range","pricetype","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("clear").addEventListener("click",()=>{$("search").value="";$("category").value="";$("brand").value="";$("range").value="TODOS";$("pricetype").value="unitario";$("sort").value="default";render()});
 render();
-</script></body></html>""".replace("__PRODUCTS__", data).replace("__ALIASES__", aliases).replace("__CHIPS__", chips).replace("__HERO_META__", hero_meta)
+</script></body></html>""".replace("__PRODUCTS__", data).replace("__ALIASES__", aliases).replace("__CHIPS__", chips).replace("__HERO_META__", hero_meta).replace("__LOGO__", logo).replace("__BACKGROUND__", background)
 
-def write_preview(rows, destination, pdf_path=None, search_aliases=None, category_icons=None, vigencia_marker=None):
+def write_preview(rows, destination, pdf_path=None, search_aliases=None, category_icons=None,
+                  vigencia_marker=None, logo_path=None, background_path=None):
     """Crea índice y fichas. Destino privado, nunca carpeta pública."""
     out = Path(destination).resolve()
     if out.exists() and any(out.iterdir()):
@@ -197,7 +205,8 @@ def write_preview(rows, destination, pdf_path=None, search_aliases=None, categor
     if len({p["slug"] for p in products}) != len(products):
         raise ValueError("Códigos duplicados; no generar páginas")
     out.mkdir(parents=True, exist_ok=True)
-    (out / "index.html").write_text(index_html(products, pdf_path, search_aliases, category_icons, vigencia_marker), encoding="utf-8")
+    (out / "index.html").write_text(index_html(products, pdf_path, search_aliases, category_icons,
+                                               vigencia_marker, logo_path, background_path), encoding="utf-8")
     for row, p in zip(rows, products):
         folder = out / "productos" / p["slug"]
         folder.mkdir(parents=True, exist_ok=True)
