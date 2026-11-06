@@ -45,11 +45,15 @@ class CatalogoIndiceTests(unittest.TestCase):
         product = public_product(sample())
         doc = index_html([product], pdf_path="catalogo-personas.pdf",
                          search_aliases={"vino": "VINOS"},
-                         category_icons={"VINOS": "assets/button_icons/vinos.webp"})
+                         category_icons={"VINOS": "assets/button_icons/vinos.webp"},
+                         vigencia_marker="2026-11-06", logo_path="assets/logo_bon_vi_mercat.png",
+                         background_path="assets/web_mockup.png")
         for snippet in ("noindex,nofollow", "perPage=80", "HASTA $10.000",
                         "PRECIO UNITARIO", "PRECIO DE VENTA", "topPager",
                         "bottomPager", "CATÁLOGO ACTUALIZADO", "assets/button_icons/vinos.webp",
-                        "catalogo-personas.pdf", "const aliases="):
+                        "catalogo-personas.pdf", "const aliases=",
+                        "Vigente hasta 06/11/2026", "assets/logo_bon_vi_mercat.png",
+                        "assets/web_mockup.png"):
             with self.subTest(snippet=snippet):
                 self.assertIn(snippet, doc)
         self.assertNotIn("__PRODUCTS__", doc)
