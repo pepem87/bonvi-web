@@ -39,6 +39,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--streamlit-dir", required=True)
     parser.add_argument("--output", required=True)
+    parser.add_argument("--snapshot", help="JSON privado con productos y vigencia; alternativa sin credenciales")
     args = parser.parse_args()
     original = Path(args.streamlit_dir).resolve()
     output = Path(args.output).resolve()
@@ -46,31 +47,42 @@ def main():
         parser.error("Falta el checkout del proyecto original")
     if output.exists() and any(output.iterdir()):
         parser.error("La carpeta de salida debe estar vacía")
-    if not os.environ.get("DATABASE_URL"):
-        parser.error("DATABASE_URL debe estar en el entorno privado")
+    if not args.snapshot and not os.environ.get("DATABASE_URL"):
+        parser.error("Se necesita DATABASE_URL o --snapshot privado")
     if Path.cwd().resolve() in output.parents or original in output.parents:
         parser.error("No generar datos dentro de los repositorios")
     rules = load_rules(original)
-    import psycopg2
-    conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=12)
-    try:
-        conn.set_session(readonly=True, autocommit=False)
-        with conn.cursor() as cur:
-            cur.execute(SQL)
-            names = [c[0] for c in cur.description]
-            rows = [dict(zip(names, r)) for r in cur.fetchall()]
-            cur.execute("SELECT valor FROM public.parametros WHERE clave='vigencia_catalogo' LIMIT 1")
-            result = cur.fetchone()
-            vigencia = str(result[0]) if result else ""
-            cur.execute(SQL_PDF)
-            pdf_names = [c[0] for c in cur.description]
-            pdf_source_rows = [dict(zip(pdf_names, r)) for r in cur.fetchall()]
-    finally:
-        conn.close()
+    if args.snapshot:
+        snapshot = Path(args.snapshot).resolve()
+        if not snapshot.is_file():
+            parser.error("El snapshot privado no existe")
+        payload = json.loads(snapshot.read_text(encoding="utf-8"))
+        rows = payload["catalogo"]
+        pdf_source_rows = payload["pdf"]
+        vigencia = str(payload.get("vigencia") or "")
+    else:
+        import psycopg2
+        conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=12)
+        try:
+            conn.set_session(readonly=True, autocommit=False)
+            with conn.cursor() as cur:
+                cur.execute(SQL)
+                names = [c[0] for c in cur.description]
+                rows = [dict(zip(names, r)) for r in cur.fetchall()]
+                cur.execute("SELECT valor FROM public.parametros WHERE clave='vigencia_catalogo' LIMIT 1")
+                result = cur.fetchone()
+                vigencia = str(result[0]) if result else ""
+                cur.execute(SQL_PDF)
+                pdf_names = [c[0] for c in cur.description]
+                pdf_source_rows = [dict(zip(pdf_names, r)) for r in cur.fetchall()]
+        finally:
+            conn.close()
     report = verify_against_original(rows, rules)
     if report["errores"]:
         raise RuntimeError("No generar: " + "; ".join(report["errores"][:10]))
     adapted = adapt_rows(rows, rules)
+    if len(adapted) != len(rows):
+        raise RuntimeError("Diferencia de cobertura entre SQL y reglas Streamlit")
     # El PDF se genera con la misma función y archivos del proyecto original.
     import sys
     sys.path.insert(0, str(original))
@@ -91,6 +103,8 @@ def main():
                "bon_vi_logo.png", "logo_bonvi.png")] if p.exists()), None),
         original / "assets",
     )
+    if not pdf.startswith(b"%PDF-"):
+        raise RuntimeError("El generador original no produjo un PDF válido")
     output.mkdir(parents=True, exist_ok=True)
     (output / "catalogo-personas.pdf").write_bytes(pdf)
     # Los metadatos públicos se construyen con las reglas de Streamlit.
