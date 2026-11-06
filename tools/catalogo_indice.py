@@ -2,6 +2,7 @@
 No conecta a BD ni publica datos. Reutiliza la plantilla HTML de vista previa.
 """
 import html
+from datetime import datetime
 import json
 import re
 from urllib.parse import urlsplit
@@ -46,13 +47,19 @@ def public_product(item):
             "imagen_categoria": category_image(item),
             "slug": slug(str(item["producto"])) + "-" + slug(str(item["codigo"]))}
 
-def index_html(products, pdf_path=None, search_aliases=None, category_icons=None):
+def index_html(products, pdf_path=None, search_aliases=None, category_icons=None, vigencia_marker=None):
     """Genera un HTML estático con búsqueda, filtros, redes y acceso a PDF.
     pdf_path debe ser un archivo público revisado y versionado; nunca un enlace ficticio.
     """
     data = json.dumps(products, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     aliases = json.dumps(search_aliases or {}, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
     chips = json.dumps(category_icons or {}, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+    date = str(vigencia_marker or "").strip().split("T", 1)[0][:10]
+    try:
+        date = datetime.strptime(date, "%Y-%m-%d").strftime("%d/%m/%Y") if date else ""
+    except ValueError:
+        pass
+    hero_meta = (f"<strong>Vigente hasta {html.escape(date)}</strong> · " if date else "") + f"{len(products)} productos"
     if pdf_path:
         if not re.fullmatch(r"[a-zA-Z0-9_./-]+\.pdf", pdf_path) or pdf_path.startswith("/") or ".." in pdf_path:
             raise ValueError("Ruta PDF no segura")
@@ -62,7 +69,7 @@ def index_html(products, pdf_path=None, search_aliases=None, category_icons=None
     return """<!doctype html><html lang="es-AR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Catálogo de bebidas | BON VI MERCAT La Plata</title>
+<title>Catálogo BON VI MERCAT | Bebidas, aceites y acetos en La Plata</title>
 <style>
 :root{--green:#173d31;--ivory:#f5f0e6}*{box-sizing:border-box}
 body{margin:0;background:var(--ivory);color:var(--green);font:16px system-ui}
@@ -71,6 +78,7 @@ header a,footer a{color:white;text-decoration:none}.brand{font:700 22px Georgia,
 nav{display:flex;gap:16px}.wrap{max-width:840px;margin:auto;padding:20px 16px 70px}
 .hero{text-align:center;background:#fffaf3;border:1px solid #ddd5c7;border-radius:20px;padding:26px 15px}
 h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
+.hero-meta{font-size:14px;color:#536158}.hero-meta strong{color:#294a3c}
 .panel{background:#fffdf8;border:1px solid #ddd5c7;border-radius:17px;padding:19px;margin:16px 0}
 .pdf{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
 .download{padding:13px 18px;border:1px solid var(--green);border-radius:25px;color:var(--green);text-decoration:none}
@@ -103,7 +111,7 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 @media(max-width:700px){.product-photo{width:66px;min-height:104px}.product-photo img{height:104px}.product{padding:10px;grid-template-columns:66px minmax(0,1fr);gap:10px}.filters{grid-template-columns:1fr}.categories{grid-template-columns:repeat(2,1fr)}.searchrow{grid-template-columns:1fr}.sale-row{display:block}.price-wrap{text-align:left;margin:9px 0 0}.pager{flex-wrap:wrap}.pager span{order:-1;width:100%;text-align:center}}
 </style></head><body>
 <header><a class="brand" href="/">BON VI MERCAT</a><nav><a aria-label="WhatsApp" href="https://wa.me/5492216816892">WhatsApp</a><a aria-label="Instagram" href="https://www.instagram.com/bonvimercat/">Instagram</a></nav></header>
-<main class="wrap"><section class="hero"><div class="muted">BUENAS BEBIDAS · MEJORES ENCUENTROS</div><h1>CATÁLOGO ACTUALIZADO</h1></section>
+<main class="wrap"><section class="hero"><div class="muted">BUENAS BEBIDAS · MEJORES ENCUENTROS</div><h1>CATÁLOGO ACTUALIZADO</h1><div class="hero-meta">__HERO_META__</div></section>
 <section class="panel pdf"><div><strong>¿Preferís la lista completa?</strong><div class="muted">Catálogo en PDF</div></div>""" + pdf + """</section>
 <section class="panel"><h2>¿Qué estás buscando?</h2><p class="muted">Buscá por código, marca o producto.</p>
 <div class="searchrow"><input id="search" type="search" aria-label="Buscar" placeholder="🔎 Código, Chandon, jugo, Fernet..."><button type="button" id="clear" class="clear">✕ Limpiar</button></div></section>
@@ -133,7 +141,7 @@ const inRange=(n,r)=>r==="TODOS"||(r==="HASTA $10.000"?n<=10000:r==="$10.001 A $
 const price=p=>Number(p[$("pricetype").value]);
 const perPage=80;
 let page=1, filtered=[],signature="";
-$("category").innerHTML='<option value="">TODAS LAS CATEGORÍAS</option>'+[...new Set(products.map(p=>p.categoria).filter(Boolean))].sort().map(c=>'<option value="'+esc(c)+'">'+esc(catName(c))+'</option>').join("")+'<option value="OTROS">OTROS</option>';
+$("category").innerHTML='<option value="">TODAS LAS CATEGORÍAS</option>'+[...new Set(products.map(p=>p.categoria).filter(c=>c&&c!=="OTROS"))].sort().map(c=>'<option value="'+esc(c)+'">'+esc(catName(c))+'</option>').join("")+'<option value="OTROS">OTROS</option>';
 $("brand").innerHTML='<option value="">TODAS LAS MARCAS</option>'+[...new Set(products.map(p=>p.marca).filter(Boolean))].sort().map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join("");
 $("categories").innerHTML=cats.map(c=>'<button type="button" data-cat="'+esc(c)+'" aria-pressed="false">'+(chipIcons[c]?'<img loading="lazy" alt="" src="'+esc(chipIcons[c])+'">':"")+esc(catName(c))+'</button>').join("");
 $("bottomPDF").innerHTML=document.querySelector(".pdf .download")?document.querySelector(".pdf .download").outerHTML:"";
@@ -178,9 +186,9 @@ document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()
 ["search","category","brand","range","pricetype","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("clear").addEventListener("click",()=>{$("search").value="";$("category").value="";$("brand").value="";$("range").value="TODOS";$("pricetype").value="unitario";$("sort").value="default";render()});
 render();
-</script></body></html>""".replace("__PRODUCTS__", data).replace("__ALIASES__", aliases).replace("__CHIPS__", chips)
+</script></body></html>""".replace("__PRODUCTS__", data).replace("__ALIASES__", aliases).replace("__CHIPS__", chips).replace("__HERO_META__", hero_meta)
 
-def write_preview(rows, destination, pdf_path=None, search_aliases=None, category_icons=None):
+def write_preview(rows, destination, pdf_path=None, search_aliases=None, category_icons=None, vigencia_marker=None):
     """Crea índice y fichas. Destino privado, nunca carpeta pública."""
     out = Path(destination).resolve()
     if out.exists() and any(out.iterdir()):
@@ -189,7 +197,7 @@ def write_preview(rows, destination, pdf_path=None, search_aliases=None, categor
     if len({p["slug"] for p in products}) != len(products):
         raise ValueError("Códigos duplicados; no generar páginas")
     out.mkdir(parents=True, exist_ok=True)
-    (out / "index.html").write_text(index_html(products, pdf_path, search_aliases, category_icons), encoding="utf-8")
+    (out / "index.html").write_text(index_html(products, pdf_path, search_aliases, category_icons, vigencia_marker), encoding="utf-8")
     for row, p in zip(rows, products):
         folder = out / "productos" / p["slug"]
         folder.mkdir(parents=True, exist_ok=True)
