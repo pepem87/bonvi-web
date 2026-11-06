@@ -40,6 +40,7 @@ def main():
     parser.add_argument("--streamlit-dir", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--snapshot", help="JSON privado con productos y vigencia; alternativa sin credenciales")
+    parser.add_argument("--imagenes", help="JSON privado codigo -> URL HTTPS verificada, opcional")
     args = parser.parse_args()
     original = Path(args.streamlit_dir).resolve()
     output = Path(args.output).resolve()
@@ -107,6 +108,17 @@ def main():
         raise RuntimeError("El generador original no produjo un PDF válido")
     output.mkdir(parents=True, exist_ok=True)
     (output / "catalogo-personas.pdf").write_bytes(pdf)
+    # Asignación estricta por código, sin búsquedas automáticas ni fotografías erróneas.
+    if args.imagenes:
+        mapping = json.loads(Path(args.imagenes).read_text(encoding="utf-8"))
+        if not isinstance(mapping, dict):
+            raise ValueError("El manifiesto de imágenes debe ser un objeto JSON")
+        valid_codes = {str(row["codigo"]) for row in adapted}
+        unknown = set(mapping) - valid_codes
+        if unknown:
+            raise ValueError(f"Imágenes con códigos desconocidos: {sorted(unknown)[:5]}")
+        for row in adapted:
+            row["imagen_verificada"] = mapping.get(str(row["codigo"]), "")
     # Los metadatos públicos se construyen con las reglas de Streamlit.
     for r in adapted:
         r["categoria"] = r["categoria_publica"]
