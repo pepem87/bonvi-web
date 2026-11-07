@@ -2,7 +2,7 @@
   "description": "ZIP de catálogo público preparado exclusivamente para publicación en el mismo dominio, sin costos internos.",
   "zip_size": 6873698,
   "zip_sha256": "952b809e0935e9eff161412dd16b4bb6fe3b8d580455aa726829801e32cbb67f",
-  "expected_files": 1578,
+  "expected_files": 1579,
   "expected_pages": 1558,
   "expected_products": 1541,
   "expected_categories": 16,
