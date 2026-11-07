@@ -123,6 +123,24 @@ def audit_package(folder, reference_html):
         raise ValueError("El PDF no puede abrirse correctamente") from error
     if pdf_pages < 1:
         raise ValueError("El PDF generado no tiene páginas")
+    # Control exhaustivo: cada SKU y ambos precios deben figurar en el PDF.
+    # El generador original dispone el código en una línea independiente.
+    pdf_text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    matches = [(m.group(1), m.start(), m.end())
+               for m in re.finditer(r"(?m)^\s*(\d{1,5})\s*$", pdf_text)
+               if m.group(1) in products]
+    if len(matches) != len(products) or {m[0] for m in matches} != set(products):
+        raise ValueError("El PDF no contiene exactamente todos los códigos del catálogo")
+    price_errors = []
+    for i, (code, _, end) in enumerate(matches):
+        next_start = matches[i + 1][1] if i + 1 < len(matches) else len(pdf_text)
+        row_text = pdf_text[end:next_start]
+        for field in ("unitario", "precio"):
+            expected = "$ " + format(products[code][field], ",.0f").replace(",", ".")
+            if expected not in row_text:
+                price_errors.append(code + ": " + field)
+    if price_errors:
+        raise ValueError("Precios del PDF divergentes: " + ", ".join(price_errors[:10]))
     control = json.loads((root / "control-privado.json").read_text(encoding="utf-8"))
     if control.get("productos") != len(products) or control.get("errores"):
         raise ValueError("Falla el control del generador original")
@@ -142,6 +160,7 @@ def audit_package(folder, reference_html):
         "integridad": "OK",
         "pdf_bytes": pdf.stat().st_size,
         "pdf_paginas": pdf_pages,
+        "precios_pdf_verificados": len(products) * 2,
         "pdf_productos_fuente": control["pdf_productos"],
         "fichas_verificadas": actual_pages,
         "vigencia": control.get("vigencia", ""),
