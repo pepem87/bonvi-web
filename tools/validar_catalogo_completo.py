@@ -85,6 +85,9 @@ def audit(original, output, data_dir, vigencia):
     checks["noindex_pruebas"] = 'content="noindex,nofollow"' in page
     checks["80_por_pagina"] = "perPage=80" in page
     checks["1541_productos_indexados_en_JSON"] = page.count('"codigo": ') == 1541
+    # La referencia no debe cambiar silenciosamente al regenerarse en otro entorno.
+    from validar_sincronizacion import approved_fingerprint, APPROVED_PUBLIC_SHA256
+    checks["huella_copia_aprobada"] = approved_fingerprint(index_file) == APPROVED_PUBLIC_SHA256
     checks["fichas_individuales"] = len(list((output / "productos").glob("*/index.html"))) == 1541
     checks["logo_original"] = (output / "assets/logo_bon_vi_mercat.png").is_file()
     checks["fondo_original"] = (output / "assets/web_mockup.png").is_file()
