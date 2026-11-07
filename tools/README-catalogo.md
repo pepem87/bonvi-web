@@ -60,3 +60,20 @@ python -m unittest discover -s tools -p 'test_*.py'
 **No hacer todavía:** sincronizar mediante tareas periódicas, unir la rama a `main`, alterar Supabase/Streamlit, crear fichas indexables ni actualizar `sitemap.xml`.
 
 **Advertencia:** la rama está en un repositorio GitHub público y ya contiene archivos `preview/datos/catalogo-*.json` de una prueba anterior. La etiqueta HTML `noindex` no restringe acceso a esos archivos. No subir datos privados, costos, credenciales o nuevos snapshots no aprobados.
+
+
+## Auditoría de los 1.541 productos — 07/11/2026
+
+Comprobación **de solo lectura** contra la tabla `public.productos` de la base vigente BON VI (marca de vigencia `2026-11-06T16:12:55.260294Z`) y los 16 archivos de datos de la rama de desarrollo.
+
+- Registros totales en Supabase: **1.652**; activos y publicables según el SQL del catálogo: **1.541**; el resto (111) no debe publicarse.
+- Registros comparados: **1.541 de Supabase frente a 1.541 de la muestra**, con **1.541 códigos únicos en cada origen**.
+- Diferencias de **código presente, nombre, familia, presentación, UxB, modalidad efectiva, precio unitario personas, orden L7 y posición relativa:** **cero**.
+- Modalidades efectivas: **1.270 BULTO** y **271 UNIDAD**, de las cuales **147** siguen la marca `PEDI POR UNIDAD` (todas constan efectivamente como UNIDAD en la BD).
+- Excepciones detectadas: productos **1410, 1582 y 1947** llevan `modalidad=BULTO` y `uxb=1`. El catálogo original los muestra como **venta por unidad**, y se corrigió el generador de fichas y tarjetas para igualar este comportamiento.
+- Sin precios unitarios nulos/no positivos, UxB inválido, UxB fraccionario ni nombres o familias vacíos.
+- En los datos fuente hay **446 presentaciones vacías** y **130 órdenes L7 nulos**. Se verificó que ambas condiciones están iguales en la muestra; el catálogo original omite presentaciones vacías y ordena valores nulos al final.
+
+**Alcance preciso:** esta auditoría demuestra equivalencia de los datos fuente y reglas de modalidad examinadas. No demuestra todavía la reproducción visual de todas las tarjetas, el resultado de todas las categorías o filtros con el motor Python original, la generación efectiva del PDF, ni el despliegue y la sincronización. Antes de cerrar la Fase 1, ejecutar el generador integrado, correr pruebas Python y comparar una salida real de extremo a extremo con Streamlit.
+
+Ninguna consulta de esta auditoría modificó Supabase; los ajustes permanecen exclusivamente en la rama `desarrollo/catalogo-seo-l7`.
