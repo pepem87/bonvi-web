@@ -1,0 +1,42 @@
+name: Validar paquete de publicacion BON VI (sin publicar)
+on:
+  push:
+    branches:
+      - desarrollo/catalogo-seo-l7
+    paths:
+      - '.deployment_parts/**'
+      - 'tools/validar_paquete_publicacion.py'
+      - '.github/workflows/verificar-paquete-publicacion.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cargar rama de desarrollo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar lector PDF para auditoria
+        run: python -m pip install 'pypdf>=5,<7'
+      - name: Recuperar ZIP aprobado desde sus partes binarias
+        run: |
+          mkdir -p /tmp/bonvi
+          cat .deployment_parts/part_* > /tmp/bonvi/catalogo.zip
+          echo "SHA:"
+          sha256sum /tmp/bonvi/catalogo.zip
+          test "$(sha256sum /tmp/bonvi/catalogo.zip | cut -d' ' -f1)" = "952b809e0935e9eff161412dd16b4bb6fe3b8d580455aa726829801e32cbb67f"
+      - name: Auditar 1541 fichas, 44 paginas PDF, URLs, filtros y noindex
+        run: |
+          python tools/validar_paquete_publicacion.py \
+            --zip /tmp/bonvi/catalogo.zip \
+            --manifest .deployment_parts/manifest.json
+      - name: Anunciar que NO hubo despliegue
+        run: echo "ZIP AUDITADO; NO MODIFICADO MAIN, DOMINIO NI STREAMLIT"
