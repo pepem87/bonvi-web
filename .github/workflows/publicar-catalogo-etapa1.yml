@@ -1,0 +1,71 @@
+name: Publicar BON VI catalogo - etapa 1 protegida
+on:
+  push:
+    branches:
+      - desarrollo/catalogo-seo-l7
+    paths:
+      - '.deployment_parts/AUTORIZAR_ETAPA1'
+permissions:
+  contents: write
+concurrency:
+  group: bonvi-deploy-catalogo
+  cancel-in-progress: false
+
+jobs:
+  catalogo-protegido:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Leer paquete preparado desde rama de desarrollo
+        uses: actions/checkout@v4
+        with:
+          path: source
+          ref: desarrollo/catalogo-seo-l7
+          persist-credentials: false
+      - name: Descargar web actual sin modificaciones
+        uses: actions/checkout@v4
+        with:
+          path: site
+          ref: main
+          fetch-depth: 0
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar verificador del PDF
+        run: python -m pip install --disable-pip-version-check 'pypdf>=5,<7'
+      - name: Bloquear si la portada cambio desde nuestra auditoria
+        run: |
+          cd site
+          test "$(git rev-parse HEAD)" = "ef6b1d1949a00bf62a1dd26c0f33c3c6bb0c9dad"
+          test ! -e catalogo
+          echo "Portada publica original preservada."
+      - name: Reconstruir ZIP y revisar todos los archivos
+        run: |
+          mkdir -p "$RUNNER_TEMP/bonvi"
+          cat source/.deployment_parts/part_* > "$RUNNER_TEMP/bonvi/catalogo.zip"
+          python source/tools/validar_paquete_publicacion.py \
+            --zip "$RUNNER_TEMP/bonvi/catalogo.zip" \
+            --manifest source/.deployment_parts/manifest.json \
+            --extract site/catalogo
+      - name: Verificar que la etapa 1 no afecta portada ni sitemap
+        run: |
+          cd site
+          test -f CNAME && test "$(cat CNAME)" = "bonvimercat.com.ar"
+          test -f robots.txt && test -f sitemap.xml
+          test -f catalogo/index.html
+          test -f catalogo/catalogo-personas.pdf
+          test "$(find catalogo -name index.html | wc -l)" -eq 1558
+          test "$(git status --short | grep -c '^?? catalogo/' || true)" -eq 1
+          git diff --exit-code -- index.html robots.txt sitemap.xml CNAME
+      - name: Publicar SOLO /catalogo/ con noindex de seguridad
+        run: |
+          cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- catalogo
+          git commit -m "Publish protected BON VI catalog under /catalogo/ (1541 products, noindex)"
+          git push origin HEAD:main
+      - name: Confirmacion
+        run: |
+          echo "Publicado exclusivamente /catalogo/ con NOINDEX."
+          echo "La portada actual, sitemap, robots, CNAME y Streamlit permanecen intactos."
