@@ -16,11 +16,12 @@ def public_offer(modalidad, uxb, precio_persona_unit):
     unit_price = money(precio_persona_unit)
     if unit_price <= 0 or units <= 0 or units != units.to_integral_value():
         raise ValueError("Precio o cantidad por bulto inválidos")
-    if mode == "BULTO":
+    # Igual que el catálogo Streamlit: BULTO con UxB=1 se exhibe por unidad.
+    if mode == "BULTO" and units > 1:
         return {"tipo": "bulto", "cantidad": int(units),
                 "precio_total": money(unit_price * units),
                 "precio_unitario_referencia": unit_price}
-    if mode == "UNIDAD":
+    if mode in {"UNIDAD", "BULTO"}:
         return {"tipo": "unidad", "cantidad": 1,
                 "precio_total": unit_price,
                 "precio_unitario_referencia": unit_price}
@@ -30,4 +31,5 @@ def public_offer(modalidad, uxb, precio_persona_unit):
 if __name__ == "__main__":
     assert public_offer("BULTO", 24, 2150)["precio_total"] == Decimal("51600.00")
     assert public_offer("UNIDAD", 12, 2150)["precio_total"] == Decimal("2150.00")
+    assert public_offer("BULTO", 1, 46750)["tipo"] == "unidad"
     print("Reglas de modalidad: OK")
