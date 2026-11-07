@@ -65,7 +65,7 @@ def main():
         import psycopg2
         conn = psycopg2.connect(os.environ["DATABASE_URL"], connect_timeout=12)
         try:
-            conn.set_session(readonly=True, autocommit=False, isolation_level="REPEATABLE READ")
+            conn.set_session(readonly=True, autocommit=False)
             with conn.cursor() as cur:
                 cur.execute(SQL)
                 names = [c[0] for c in cur.description]
