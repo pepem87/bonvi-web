@@ -31,6 +31,16 @@ class CatalogoIndiceTests(unittest.TestCase):
         self.assertEqual(single["precio"], 2500)
         self.assertEqual(single["tipo"], "unidad")
 
+    def test_bulto_con_uxb_uno_se_publica_por_unidad(self):
+        # Códigos reales de Supabase: 1410, 1582, 1947.
+        for codigo in ("1410", "1582", "1947"):
+            with self.subTest(codigo=codigo):
+                row = sample(code=codigo, mode="BULTO", uxb=1, unit=46750)
+                product = public_product(row)
+                self.assertEqual(product["tipo"], "unidad")
+                self.assertEqual(product["precio"], 46750)
+                self.assertEqual(product["uxb"], 1)
+
     def test_no_incluir_costos_internos(self):
         row = sample()
         row["costo_unitario"] = 1000
