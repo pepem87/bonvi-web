@@ -1,0 +1,43 @@
+name: Probar cambio final de catalogo BON VI sin publicar
+on:
+  push:
+    branches:
+      - desarrollo/catalogo-seo-l7
+    paths:
+      - 'tools/finalizar_publicacion_bonvi.py'
+      - '.github/workflows/probar-finalizacion-catalogo.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prepublicacion:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: desarrollo/catalogo-seo-l7
+          path: source
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          path: site
+          persist-credentials: false
+      - name: Confirmar estado actual original de Pages
+        run: |
+          cd site
+          test "$(git rev-parse HEAD)" = "ad17e86db587db9b19119342576a9f36a051c88b"
+      - name: Generar todos los cambios en copia descartable
+        run: python source/tools/finalizar_publicacion_bonvi.py --site site
+      - name: Revisar SEO, filtros y sitemap antes de aceptar
+        run: |
+          set -eu
+          grep -q 'href="catalogo/?categoria=OTROS"' site/index.html
+          grep -q 'href="catalogo/?categoria=APERITIVOS"' site/index.html
+          grep -q 'href="../catalogo/?categoria=APERITIVOS"' site/gin-la-plata/index.html
+          test "$(find site/catalogo -name index.html | wc -l)" -eq 1558
+          test "$(grep -R -l 'content="noindex,nofollow"' site/catalogo --include=index.html | wc -l)" -eq 0
+          grep -q 'content="index,follow"' site/catalogo/index.html
+          test "$(git -C site status --short | grep 'CNAME\|robots.txt' | wc -l)" -eq 0
+          git -C site status --short | tail -12
+          echo "PRUEBA FINAL SUPERADA, NO SE PUBLICO."
