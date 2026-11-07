@@ -52,10 +52,14 @@ def seo_tags(title, description, canonical, crumb, website=False):
             '<meta property="og:description" content="' + esc(description) + '">\n'
             '<meta property="og:url" content="' + esc(canonical) + '">\n'
             '<meta name="twitter:card" content="summary">\n')
-    breadcrumb = {'@context':'https://schema.org','@type':'BreadcrumbList',
-                  'itemListElement':[{'@type':'ListItem', 'position':i+1, 'name':name,
-                                      'item':url} for i,(name,url) in enumerate(crumb)]}
-    return meta + '<script type="application/ld+json">' + safe_json(breadcrumb) + '</script>\n'
+    if len(crumb)>=2:
+        structured={'@context':'https://schema.org','@type':'BreadcrumbList',
+                    'itemListElement':[{'@type':'ListItem', 'position':i+1, 'name':name,
+                                        'item':url} for i,(name,url) in enumerate(crumb)]}
+    else:
+        structured={'@context':'https://schema.org','@type':'WebSite',
+                    'name':'BON VI MERCAT','url':canonical,'inLanguage':'es-AR'}
+    return meta + '<script type="application/ld+json">' + safe_json(structured) + '</script>\n'
 
 
 def get_products(index_path):
