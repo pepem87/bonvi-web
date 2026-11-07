@@ -1,0 +1,5 @@
+Autorizacion expresa del usuario del 07/11/2026 para avanzar con la publicacion del catalogo en bonvimercat.com.ar.
+ETAPA 1: Publicar unicamente /catalogo/, mantener noindex y no cambiar portada, sitemap, CNAME ni Streamlit.
+Paquete verificado: ZIP SHA256 952b809e0935e9eff161412dd16b4bb6fe3b8d580455aa726829801e32cbb67f.
+1541 productos, 16 categorias, 44 paginas PDF, 1558 HTML.
+En ETAPA 2 se modificaran los enlaces y se activara indexacion solo si ETAPA 1 valida HTTP 200.
