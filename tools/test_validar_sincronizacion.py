@@ -34,7 +34,7 @@ class SyncTests(unittest.TestCase):
             one=Path(temp)/'a.html'
             two=Path(temp)/'b.html'
             prefix='<meta content="noindex,nofollow"><script>const products='
-            suffix=';\\nconst aliases={};</script>'
+            suffix=';\nconst aliases={};</script>'
             first=item('1')
             second=item('2')
             one.write_text(prefix+json.dumps([first,second])+suffix)
