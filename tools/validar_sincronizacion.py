@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Compara dos catálogos HTML privados; nunca autoriza ni realiza publicación."""
 import argparse
+import hashlib
 import json
 import math
 import re
@@ -35,6 +36,18 @@ def load(path):
             raise ValueError('Precio de venta inconsistente')
         catalog[code]=item
     return catalog
+
+# Huella fijada de la copia local que el usuario probó y aprobó el 07/11/2026.
+# Incluye todas las fichas y los campos públicos, no solo el número de productos.
+APPROVED_PUBLIC_SHA256 = "905fd6580af7d4b1e56ef5a163c74a7afdf1a2aa94d794efe38bcb7d66669d6c"
+
+def approved_fingerprint(path):
+    products = load(path)
+    canonical = json.dumps(
+        [products[key] for key in sorted(products)],
+        ensure_ascii=False, sort_keys=True, separators=(',', ':')
+    )
+    return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
 
 def compare(old,new):
     common=set(old)&set(new)
