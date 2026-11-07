@@ -113,6 +113,15 @@ def audit_package(folder, reference_html):
     pdf = root / "catalogo-personas.pdf"
     if not pdf.exists() or pdf.stat().st_size < 1024 or pdf.open("rb").read(5) != b"%PDF-":
         raise ValueError("El PDF original regenerado falta o no es válido")
+    # Validar estructura real del PDF, no solo la cabecera de 5 bytes.
+    from pypdf import PdfReader
+    try:
+        reader = PdfReader(str(pdf), strict=True)
+        pdf_pages = len(reader.pages)
+    except Exception as error:
+        raise ValueError("El PDF no puede abrirse correctamente") from error
+    if pdf_pages < 1:
+        raise ValueError("El PDF generado no tiene páginas")
     control = json.loads((root / "control-privado.json").read_text(encoding="utf-8"))
     if control.get("productos") != len(products) or control.get("errores"):
         raise ValueError("Falla el control del generador original")
@@ -131,6 +140,7 @@ def audit_package(folder, reference_html):
     result.update({
         "integridad": "OK",
         "pdf_bytes": pdf.stat().st_size,
+        "pdf_paginas": pdf_pages,
         "pdf_productos_fuente": control["pdf_productos"],
         "fichas_verificadas": actual_pages,
         "vigencia": control.get("vigencia", ""),
