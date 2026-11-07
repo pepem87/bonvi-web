@@ -1,0 +1,60 @@
+{
+  "description": "ZIP de catálogo público preparado exclusivamente para publicación en el mismo dominio, sin costos internos.",
+  "zip_size": 6873698,
+  "zip_sha256": "952b809e0935e9eff161412dd16b4bb6fe3b8d580455aa726829801e32cbb67f",
+  "expected_files": 1578,
+  "expected_pages": 1558,
+  "expected_products": 1541,
+  "expected_categories": 16,
+  "original_pdf_sha256": "6a8f2a3256b1bf6119228be130ad1e60e48d80aaee451912d861178d7fb2c120",
+  "parts": [
+    {
+      "path": ".deployment_parts/part_00",
+      "sha": "e38e55371ffe408102ec0670820d04e402cb9fec"
+    },
+    {
+      "path": ".deployment_parts/part_01",
+      "sha": "82810e5ef8a5856d2524d3c26cf27c3b60c13c4d"
+    },
+    {
+      "path": ".deployment_parts/part_02",
+      "sha": "472910b19295964e721a5ed97795eb0ca07a1767"
+    },
+    {
+      "path": ".deployment_parts/part_03",
+      "sha": "bca42f8ffd733422b60bd62d461820c4dc3e24d8"
+    },
+    {
+      "path": ".deployment_parts/part_04",
+      "sha": "6310b35a259ab8b95cf89c09d98159a820c04f7b"
+    },
+    {
+      "path": ".deployment_parts/part_05",
+      "sha": "7d7cde5fabd6de108b5b142ec9afa5faaf5d038e"
+    },
+    {
+      "path": ".deployment_parts/part_06",
+      "sha": "a39830dcefe66d4e19bc0c01c21220ea3d252fbb"
+    },
+    {
+      "path": ".deployment_parts/part_07",
+      "sha": "640aa371e06f3a5154b66bb711bffe5cdb845ee6"
+    },
+    {
+      "path": ".deployment_parts/part_08",
+      "sha": "c1901bc7b57f1d13efbcb3396732104113826c1e"
+    },
+    {
+      "path": ".deployment_parts/part_09",
+      "sha": "8b41fe8202df34e489c69d1f60a6f75a114d2576"
+    },
+    {
+      "path": ".deployment_parts/part_10",
+      "sha": "5e45acda9f9ab5789c584281785e863c3cbeb9ce"
+    },
+    {
+      "path": ".deployment_parts/part_11",
+      "sha": "734b46802b0fb0fc60ba00ea0c20a5a322b63f27"
+    }
+  ]
+}
