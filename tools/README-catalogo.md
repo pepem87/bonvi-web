@@ -39,6 +39,28 @@ Las pruebas incluyen una comparación de la referencia real de 1.541
 productos consigo misma (cero cambios), una simulación de cambio de precio,
 altas y bajas, modalidades y rechazo de campos contables internos.
 
+## Prueba de equivalencia con Supabase — 07/11/2026
+
+Se ejecutó una consulta real de **solo lectura** a Supabase y se compararon
+huellas MD5 independientes con el `index.html` del ZIP aprobado que el usuario
+compartió. Se verificaron los 1.541 códigos en su orden, nombres, familias,
+presentaciones, precios unitarios y de venta, modalidad y UxB.
+
+- Hash campos comerciales: `ff88b4140ceafd9d93d453cee9049444` en ambos orígenes.
+- Hash precios/modos: `34911825f17b2fbe38122ec69d905bfc` en ambos orígenes.
+- Hash orden de códigos: `11b613520c74c7eb0c801dd097f07ae6` en ambos orígenes.
+- Sin diferencias. Vigencia observada: `2026-11-06T16:12:55.260294Z`.
+- El PDF adjuntado y aprobado tiene 44 páginas.
+
+Se comprobó **en memoria** que subir el precio unitario de prueba del código
+2063 de $3.950 a $4.050 cambiaría el precio del bulto de seis unidades de
+$23.700 a $24.300 y alteraría la huella de precios. **No se modificó ningún
+precio real** ni se guardó esa simulación como nuevo catálogo.
+
+**Estado:** equivalencia actual verificada; todavía falta comprobar una
+regeneración efectiva de HTML + fichas + PDF desde una exportación posterior,
+y luego automatizarla. Esta prueba no representa sincronización automática.
+
 ---
 
 ## Historial y documentación anterior
