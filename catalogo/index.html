@@ -6,7 +6,7 @@
 :root{--green:#173d31;--ivory:#f5f0e6}*{box-sizing:border-box}
 body{margin:0;background:var(--ivory);background-image:linear-gradient(rgba(244,240,232,.86),rgba(244,240,232,.93)),url("assets/web_mockup.png");background-position:center top;background-size:cover;background-attachment:fixed;color:var(--green);font:16px system-ui}
 header,footer{background:var(--green);color:white;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-header a,footer a{color:white;text-decoration:none}.brand{font:700 22px Georgia,serif;letter-spacing:2px}
+header a,footer a{color:white;text-decoration:none}.brand{display:inline-flex;align-items:center}.brand img{height:62px;max-width:min(220px,45vw);width:auto;object-fit:contain;display:block}
 nav{display:flex;gap:16px}.wrap{max-width:840px;margin:auto;padding:20px 16px 70px}
 .hero{text-align:center;background:rgba(255,253,248,.96);border:1px solid rgba(41,74,60,.18);border-radius:24px;padding:20px 22px 18px;box-shadow:0 12px 34px rgba(41,74,60,.12)}
 .hero-logo{width:120px;max-width:34vw;height:auto;margin:0 auto 6px;display:block}
@@ -52,7 +52,7 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"BON VI MERCAT","url":"https://bonvimercat.com.ar/catalogo/","inLanguage":"es-AR"}</script>
 </head><body>
-<header><a class="brand" href="/" aria-label="BON VI MERCAT — volver al inicio">BON VI MERCAT</a><nav><a href="/">Inicio</a><a aria-label="WhatsApp" href="https://wa.me/5492216816892">WhatsApp</a><a aria-label="Instagram" href="https://www.instagram.com/bonvimercat/">Instagram</a></nav></header>
+<header><a class="brand" href="/" aria-label="BON VI MERCAT — volver al inicio"><img src="../assets/logo-transparent-bonvi.svg" alt="BON VI MERCAT"></a><nav><a href="/">Inicio</a><a aria-label="WhatsApp" href="https://wa.me/5492216816892">WhatsApp</a><a aria-label="Instagram" href="https://www.instagram.com/bonvimercat/">Instagram</a></nav></header>
 <main class="wrap"><section class="hero"><img class="hero-logo" alt="BON VI MERCAT" src="assets/logo_bon_vi_mercat.png"><div class="muted">BUENAS BEBIDAS · MEJORES ENCUENTROS</div><h1>CATÁLOGO ACTUALIZADO</h1><div class="hero-meta"><strong>Vigente hasta 06/11/2026</strong> · 1541 productos</div></section>
 <section class="panel pdf"><div><strong>¿Preferís la lista completa?</strong><div class="muted">Catálogo en PDF</div></div><a class="download" href="catalogo-personas.pdf" download>Descargar catálogo PDF ↓</a></section>
 <section class="panel"><h2>¿Qué estás buscando?</h2><p class="muted">Buscá por código, marca o producto.</p>
