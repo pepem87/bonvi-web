@@ -16,7 +16,7 @@ class CatalogoTests(unittest.TestCase):
 
     def test_safe_html(self):
         item = dict(codigo=10, producto="Vino & Co", familia="Vinos",
-                    presentacion="750 ml", modalidad="BULTO",
+                    presentacion="750 ml", uxb=6, modalidad="BULTO",
                     precio_persona_unit=1200, slug="vino-co-10")
         page = mod.make_page(item)
         self.assertIn("Vino &amp; Co", page)
