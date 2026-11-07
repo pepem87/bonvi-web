@@ -1,0 +1,32 @@
+name: Validar catalogo BON VI (rama de desarrollo)
+on:
+  push:
+    branches:
+      - desarrollo/catalogo-seo-l7
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener codigo de la rama
+        uses: actions/checkout@v4
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Ejecutar pruebas del generador sin BD
+        run: python -m unittest discover -s tools -p 'test_*.py' -v
+      - name: Auditar los 1541 registros originales sin credenciales
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, str(Path('tools').resolve()))
+          from validar_catalogo_completo import load_archived_rows
+          rows = load_archived_rows(Path('preview/datos'))
+          print(f"Validacion de los {len(rows)} registros: OK")
+          PY
