@@ -8,6 +8,7 @@ Requiere un DATABASE_URL privado para lectura real, o --snapshot para ensayo.
 Guarda las ejecuciones fuera de ambos repositorios sin reemplazar anteriores.
 """
 import argparse
+import hashlib
 from datetime import datetime, timezone
 import json
 import math
@@ -156,6 +157,19 @@ def generate(args):
     repo = Path(__file__).resolve().parents[1]
     if not approved.is_file() or not original.is_dir():
         raise ValueError("Faltan el índice aprobado o la copia local del catálogo Streamlit")
+    reference = json.loads((repo / "tools" / "fase2_referencia_aprobada.json").read_text(encoding="utf-8"))
+    def digest(path):
+        sha = hashlib.sha256()
+        with Path(path).open("rb") as handle:
+            for part in iter(lambda: handle.read(1024 * 1024), b""):
+                sha.update(part)
+        return sha.hexdigest()
+    if digest(approved) != reference["sha256_index_aprobado"]:
+        raise ValueError("El index.html no es la copia de Fase 1 aprobada; no regenerar")
+    if args.aprobado_pdf:
+        approved_pdf = Path(args.aprobado_pdf).resolve()
+        if not approved_pdf.is_file() or digest(approved_pdf) != reference["sha256_pdf_aprobado"]:
+            raise ValueError("El PDF de referencia no coincide con la versión aprobada")
     # Nunca crear artefactos dentro del repositorio web ni del proyecto interno.
     if (output_root == repo or repo in output_root.parents or
             output_root == original or original in output_root.parents or
@@ -207,6 +221,7 @@ def generate(args):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--aprobado-html", required=True, help="index.html aprobado, inmutable")
+    p.add_argument("--aprobado-pdf", help="PDF aprobado para verificar integridad de la referencia")
     p.add_argument("--streamlit-dir", required=True, help="Checkout ORIGINAL solo de lectura")
     p.add_argument("--salida-raiz", required=True, help="Directorio privado externo a ambos repositorios")
     p.add_argument("--snapshot", help="JSON de pruebas privado (si se omite, lectura real DATABASE_URL)")
