@@ -1,0 +1,75 @@
+name: Activar catalogo BON VI en portada y SEO - etapa 2
+on:
+  push:
+    branches:
+      - desarrollo/catalogo-seo-l7
+    paths:
+      - '.deployment_parts/AUTORIZAR_ETAPA2'
+permissions:
+  contents: write
+concurrency:
+  group: bonvi-deploy-catalogo
+  cancel-in-progress: false
+jobs:
+  activar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cargar cambios validados desde desarrollo
+        uses: actions/checkout@v4
+        with:
+          path: source
+          ref: desarrollo/catalogo-seo-l7
+          persist-credentials: false
+      - name: Checkout de la web REAL en main
+        uses: actions/checkout@v4
+        with:
+          path: site
+          ref: main
+          fetch-depth: 0
+      - name: Confirmar que nadie modifico main desde etapa 1
+        run: |
+          cd site
+          test "$(git rev-parse HEAD)" = "ad17e86db587db9b19119342576a9f36a051c88b"
+      - name: Comprobar HTML y PDF en el dominio oficial ANTES de enlazar
+        run: |
+          set -euo pipefail
+          base="https://bonvimercat.com.ar"
+          curl --fail --location --silent --show-error --retry 8 --retry-delay 5 \
+            "$base/catalogo/" > /tmp/bonvi-site-index.html
+          test "$(sha256sum /tmp/bonvi-site-index.html | cut -d' ' -f1)" = "a886f464df254cf38d07805b738e99d5b5c2b6a0130853af2d027c9995043380"
+          grep -q 'content="noindex,nofollow"' /tmp/bonvi-site-index.html
+          curl --fail --location --silent --show-error --retry 8 --retry-delay 5 \
+            "$base/catalogo/catalogo-personas.pdf" > /tmp/bonvi-site.pdf
+          test "$(sha256sum /tmp/bonvi-site.pdf | cut -d' ' -f1)" = "6a8f2a3256b1bf6119228be130ad1e60e48d80aaee451912d861178d7fb2c120"
+          curl --fail --location --silent --show-error "$base/catalogo/categorias/gin/" > /dev/null
+          curl --fail --location --silent --show-error "$base/catalogo/categorias/cuidado-personal-y-hogar/" > /dev/null
+          echo "HTTP del catálogo verificado antes de cambiar la portada."
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Aplicar exclusivamente enlaces, metadatos y sitemap nuevos
+        run: python source/tools/finalizar_publicacion_bonvi.py --site site
+      - name: Verificar limites del cambio
+        run: |
+          set -euo pipefail
+          cd site
+          git diff --exit-code -- CNAME robots.txt
+          test "$(find catalogo -name index.html | wc -l)" -eq 1558
+          test "$(grep -R -l 'content="noindex,nofollow"' catalogo --include=index.html | wc -l)" -eq 0
+          grep -q 'href="catalogo/?categoria=OTROS"' index.html
+          grep -q 'href="catalogo/?categoria=APERITIVOS"' index.html
+          grep -q 'href="../catalogo/?categoria=APERITIVOS"' gin-la-plata/index.html
+          test "$(sha256sum catalogo/catalogo-personas.pdf | cut -d' ' -f1)" = "6a8f2a3256b1bf6119228be130ad1e60e48d80aaee451912d861178d7fb2c120"
+      - name: Activar catalogo en main con un solo commit reversible
+        run: |
+          cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- index.html vinos-la-plata/index.html cervezas-la-plata/index.html whisky-la-plata/index.html gin-la-plata/index.html aceites-y-acetos-la-plata/index.html sitemap.xml catalogo
+          git commit -m "Activate BON VI public catalog SEO with approved category filters and sitemap"
+          git push origin HEAD:main
+      - name: Confirmacion
+        run: |
+          echo "El sistema Streamlit y los datos de Supabase no fueron modificados."
+          echo "Se publico en GitHub Pages la portada integrada al catalogo y sitemap."
