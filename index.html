@@ -68,8 +68,8 @@
     }
     .brand-wrap{display:inline-flex;align-items:center;flex-shrink:0;color:var(--green);text-decoration:none;border-radius:9px}
     .brand-wrap:focus-visible{outline:3px solid var(--gold);outline-offset:5px}
-    /* SVG alpha filter removes the paper-colored backing at display time. */
-    .brand-logo{height:62px;width:auto;max-width:160px;display:block;object-fit:contain;filter:url(#bonvi-clear-paper)}
+    /* Fondo transparente en el archivo SVG de marca. */
+    .brand-logo{height:62px;width:auto;max-width:160px;display:block;object-fit:contain;}
     .brand{font-family:Georgia,serif;font-weight:800;letter-spacing:.11em;color:var(--green)}
     .navlinks{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
     .navlinks a{color:var(--green);font-size:.9rem;font-weight:700}
@@ -326,15 +326,11 @@
   <script src="assets/age-gate.js"></script>
 </head>
 <body>
-<svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
-  <filter id="bonvi-clear-paper" color-interpolation-filters="sRGB">
-    <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -1.8 -1.8 -1.8 0 5.05"/>
-  </filter>
-</svg>
+
 <div class="wrap">
   <nav class="nav">
     <a class="brand-wrap" href="/" aria-label="BON VI MERCAT — volver al inicio">
-      <img class="brand-logo" src="assets/logo-horizontal.png" alt="BON VI MERCAT">
+      <img class="brand-logo" src="assets/logo-transparent-bonvi.svg" alt="BON VI MERCAT">
     </a>
     <div class="navlinks">
       <a href="#bebidas">Bebidas</a>
