@@ -126,6 +126,7 @@ def main():
         r["categoria"] = r["categoria_publica"]
         r["marca"] = r["marca_publica"]
         r["precio_persona_unit"] = r["precio_unitario"]
+        r["icono_categoria"] = rules["CATEGORY_ICONS"].get(r["categoria_publica"], "🍾")
         category = r["categoria_publica"]
         product = rules["normalize_text"](r.get("producto") or "").upper()
         name = ("acetos.webp" if category == "ACEITES" and
