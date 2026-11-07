@@ -25,7 +25,7 @@ jobs:
       - name: Descargar desarrollo del catalogo (no main)
         uses: actions/checkout@v4
         with:
-          ref: desarrollo/catalogo-seo-l7
+          ref: 76dac798744eeac69133d268228f6fb8402f4099 # version de desarrollo fijada; no ejecutar código que cambie silenciosamente
           persist-credentials: false
 
       - name: Configurar Python
