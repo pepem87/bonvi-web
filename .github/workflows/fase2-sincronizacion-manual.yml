@@ -1,0 +1,83 @@
+name: Fase 2 - prueba privada de sincronizacion (manual)
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bonvi-catalogo-fase2-readonly
+  cancel-in-progress: false
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Código web (rama de desarrollo)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Pruebas de regresión locales
+        run: python -m unittest discover -s tools -p 'test_*.py' -v
+
+      - name: Verificar secretos disponibles (sin mostrar valores)
+        env:
+          PRIVATE_REPO_TOKEN: ${{ secrets.BONVI_PRIVATE_REPO_READ_TOKEN }}
+          DB_CONNECTION: ${{ secrets.BONVI_CATALOG_READONLY_DATABASE_URL }}
+        shell: bash
+        run: |
+          if [ -z "$PRIVATE_REPO_TOKEN" ] || [ -z "$DB_CONNECTION" ]; then
+            echo "::error::Faltan secretos de lectura privada. No se consultó Supabase ni se publicó."
+            exit 1
+          fi
+
+      - name: Obtener reglas originales (repositorio privado, lectura)
+        uses: actions/checkout@v4
+        with:
+          repository: pepem87/Bonvi-Mercat
+          ref: main
+          token: ${{ secrets.BONVI_PRIVATE_REPO_READ_TOKEN }}
+          path: original
+          persist-credentials: false
+
+      - name: Dependencias del generador
+        run: python -m pip install --disable-pip-version-check psycopg2-binary reportlab pillow
+
+      - name: Generar copia aprobada offline en directorio privado
+        env:
+          WORKDIR: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python tools/validar_catalogo_completo.py \
+            --streamlit-dir "$GITHUB_WORKSPACE/original/BON_VI_MERCAT_Proyecto_v7_3_ONLINE/BON_VI_MERCAT_REAL_v7_3_ONLINE" \
+            --output "$WORKDIR/bonvi-base-aprobada"
+          test -f "$WORKDIR/bonvi-base-aprobada/index.html"
+
+      - name: Generar catálogo actualizado desde Supabase (solo lectura)
+        env:
+          DATABASE_URL: ${{ secrets.BONVI_CATALOG_READONLY_DATABASE_URL }}
+          WORKDIR: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python tools/generar_catalogo_integrado.py \
+            --streamlit-dir "$GITHUB_WORKSPACE/original/BON_VI_MERCAT_Proyecto_v7_3_ONLINE/BON_VI_MERCAT_REAL_v7_3_ONLINE" \
+            --output "$WORKDIR/bonvi-catalogo-nuevo"
+          test -f "$WORKDIR/bonvi-catalogo-nuevo/catalogo-personas.pdf"
+
+      - name: Comparar catálogo anterior y nuevo, sin publicar
+        env:
+          WORKDIR: ${{ runner.temp }}
+        shell: bash
+        run: |
+          python tools/validar_sincronizacion.py \
+            --aprobado "$WORKDIR/bonvi-base-aprobada/index.html" \
+            --nuevo "$WORKDIR/bonvi-catalogo-nuevo/index.html" \
+            --reporte "$WORKDIR/control-sincronizacion.json"
+          echo "Solo validación. No se exportaron snapshots ni se modificó producción."
