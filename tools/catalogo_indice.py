@@ -73,7 +73,7 @@ def index_html(products, pdf_path=None, search_aliases=None, category_icons=None
         pdf = '<a class="download" href="' + html.escape(pdf_path, quote=True) + '" download>Descargar catálogo PDF ↓</a>'
     else:
         pdf = '<p class="pending">La descarga del PDF completo se habilitará al validar la lista vigente.</p>'
-    return """<!doctype html><html lang="es-AR"><head><meta charset="utf-8">
+    return ("""<!doctype html><html lang="es-AR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <title>Catálogo BON VI MERCAT | Bebidas, aceites y acetos en La Plata</title>
@@ -194,7 +194,7 @@ document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()
 ["search","category","brand","range","pricetype","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("clear").addEventListener("click",()=>{$("search").value="";$("category").value="";$("brand").value="";$("range").value="TODOS";$("pricetype").value="unitario";$("sort").value="default";render()});
 render();
-</script></body></html>""".replace("__PRODUCTS__", data).replace("__ALIASES__", aliases).replace("__CHIPS__", chips).replace("__HERO_META__", hero_meta).replace("__LOGO__", logo).replace("__BACKGROUND__", background)
+</script></body></html>""").replace("__PRODUCTS__", data).replace("__ALIASES__", aliases).replace("__CHIPS__", chips).replace("__HERO_META__", hero_meta).replace("__LOGO__", logo).replace("__BACKGROUND__", background)
 
 def write_preview(rows, destination, pdf_path=None, search_aliases=None, category_icons=None,
                   vigencia_marker=None, logo_path=None, background_path=None):
