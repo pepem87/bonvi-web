@@ -69,6 +69,7 @@ Comprobación **de solo lectura** contra la tabla `public.productos` de la base 
 - Registros totales en Supabase: **1.652**; activos y publicables según el SQL del catálogo: **1.541**; el resto (111) no debe publicarse.
 - Registros comparados: **1.541 de Supabase frente a 1.541 de la muestra**, con **1.541 códigos únicos en cada origen**.
 - Diferencias de **código presente, nombre, familia, presentación, UxB, modalidad efectiva, precio unitario personas, orden L7 y posición relativa:** **cero**.
+- Control independiente adicional de los **1.541 precios de venta calculados** (precio unitario × UxB cuando corresponde) y de sus **1.541 etiquetas de venta bulto/unidad**: **cero diferencias** frente a los cálculos en Supabase. Desglose de visualización: **1.267 por bulto y 274 por unidad**.
 - Modalidades efectivas: **1.270 BULTO** y **271 UNIDAD**, de las cuales **147** siguen la marca `PEDI POR UNIDAD` (todas constan efectivamente como UNIDAD en la BD).
 - Excepciones detectadas: productos **1410, 1582 y 1947** llevan `modalidad=BULTO` y `uxb=1`. El catálogo original los muestra como **venta por unidad**, y se corrigió el generador de fichas y tarjetas para igualar este comportamiento.
 - Sin precios unitarios nulos/no positivos, UxB inválido, UxB fraccionario ni nombres o familias vacíos.
