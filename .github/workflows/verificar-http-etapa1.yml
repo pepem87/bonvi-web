@@ -1,0 +1,34 @@
+name: Verificar dominio BON VI despues etapa 1
+on:
+  push:
+    branches:
+      - desarrollo/catalogo-seo-l7
+    paths:
+      - '.deployment_parts/VERIFICAR_HTTP_ETAPA1'
+permissions:
+  contents: read
+jobs:
+  http:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar el dominio REAL y sus archivos
+        run: |
+          set -euo pipefail
+          base="https://bonvimercat.com.ar"
+          for path in / /catalogo/ /catalogo/catalogo-personas.pdf \
+            /catalogo/categorias/aperitivos/ \
+            /catalogo/categorias/cuidado-personal-y-hogar/ \
+           ; do
+            case "$path" in *" "*) continue;; esac
+            echo "HTTP comprobando $path"
+            curl --fail --location --silent --show-error --retry 8 --retry-delay 6 --connect-timeout 12 --max-time 45 -o /dev/null -w '%{http_code} %{url_effective}\n' "$base$path"
+          done
+          curl --fail --location --silent --show-error --retry 8 --retry-delay 6 \
+            "$base/catalogo/" > /tmp/bonvi-index.html
+          test "$(sha256sum /tmp/bonvi-index.html | cut -d' ' -f1)" = "a886f464df254cf38d07805b738e99d5b5c2b6a0130853af2d027c9995043380"
+          grep -q 'name="robots" content="noindex,nofollow"' /tmp/bonvi-index.html
+          grep -q 'URLSearchParams(window.location.search)' /tmp/bonvi-index.html
+          curl --fail --location --silent --show-error --retry 8 --retry-delay 6 \
+            "$base/catalogo/catalogo-personas.pdf" > /tmp/bonvi.pdf
+          test "$(sha256sum /tmp/bonvi.pdf | cut -d' ' -f1)" = "6a8f2a3256b1bf6119228be130ad1e60e48d80aaee451912d861178d7fb2c120"
+          echo "HTTP EN DOMINIO REAL: 200, HTML y PDF identicos al ZIP aprobado."
