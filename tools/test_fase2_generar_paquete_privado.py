@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from pypdf import PdfWriter
+from reportlab.pdfgen import canvas
 from fase2_generar_paquete_privado import (
     load_public_html, compare_approved, audit_package,
 )
@@ -31,6 +31,22 @@ def write_html(path, products):
     )
 
 
+
+def test_pdf(path, rows):
+    """PDF sintético de dos páginas: códigos y precios en líneas separadas."""
+    pdf = canvas.Canvas(str(path), pagesize=(595, 842))
+    for i in range(2):
+        pdf.setTitle("BON VI - CATÁLOGO PRUEBA")
+        if i < len(rows):
+            item = rows[i]
+            pdf.drawString(52, 780, item["codigo"])
+            for j, key in enumerate(("unitario", "precio")):
+                price = "$ " + format(item[key], ",.0f").replace(",", ".")
+                pdf.drawString(65, 745 - j * 30, price)
+        pdf.showPage()
+    pdf.save()
+
+
 def valid_package(folder, rows):
     root = Path(folder)
     write_html(root / "index.html", rows)
@@ -48,12 +64,7 @@ def valid_package(folder, rows):
         p = root / name
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_bytes(b"fixture-graphic")
-    writer = PdfWriter()
-    writer.add_blank_page(width=595, height=842)
-    writer.add_blank_page(width=595, height=842)
-    writer.add_metadata({"/Title": "BON VI MARCAS", "/Subject": "Prueba " + "x" * 1100})
-    with (root / "catalogo-personas.pdf").open("wb") as f:
-        writer.write(f)
+    test_pdf(root / "catalogo-personas.pdf", rows)
     (root / "control-privado.json").write_text(
         json.dumps({"productos": len(rows), "pdf_productos": len(rows),
                     "vigencia": "2026-11-07", "errores": []}),
@@ -113,6 +124,17 @@ class Fase2PaquetePrivadoTests(unittest.TestCase):
             self.assertEqual(report["pdf_paginas"], 2)
             self.assertEqual(report["estado"], "IGUAL_A_APROBADO")
             self.assertFalse(report["publicacion_autorizada"])
+
+    def test_auditoria_bloquea_precio_erroneo_en_pdf(self):
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d) / "new"
+            approved = Path(d) / "approved.html"
+            data = [item()]
+            valid_package(root, data)
+            write_html(approved, data)
+            test_pdf(root / "catalogo-personas.pdf", [item(price=6600)])
+            with self.assertRaisesRegex(ValueError, "Precios del PDF divergentes"):
+                audit_package(root, approved)
 
     def test_auditoria_detecta_una_ficha_ausente(self):
         with tempfile.TemporaryDirectory() as d:
