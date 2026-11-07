@@ -66,11 +66,10 @@
       position:sticky;top:14px;z-index:20;
       box-shadow:0 8px 30px rgba(23,61,49,.07);
     }
-    .brand-wrap{display:inline-flex;align-items:center;gap:13px;flex-shrink:0;color:var(--green);text-decoration:none;border-radius:9px}
+    .brand-wrap{display:inline-flex;align-items:center;flex-shrink:0;color:var(--green);text-decoration:none;border-radius:9px}
     .brand-wrap:focus-visible{outline:3px solid var(--gold);outline-offset:5px}
-    .brand-logo{height:50px;width:auto;max-width:156px;display:block;object-fit:contain}
-    .brand-name{font-family:Georgia,serif;font-size:1.05rem;font-weight:800;letter-spacing:.06em;white-space:nowrap;color:var(--green)}
-    .nav-home{white-space:nowrap}
+    /* SVG alpha filter removes the paper-colored backing at display time. */
+    .brand-logo{height:62px;width:auto;max-width:160px;display:block;object-fit:contain;filter:url(#bonvi-clear-paper)}
     .brand{font-family:Georgia,serif;font-weight:800;letter-spacing:.11em;color:var(--green)}
     .navlinks{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
     .navlinks a{color:var(--green);font-size:.9rem;font-weight:700}
@@ -257,7 +256,7 @@
     @media(max-width:620px){
       .wrap{padding:14px 12px 36px}
       .nav{position:static}
-      .navlinks{display:flex;gap:10px}.navlinks a:not(.nav-home){display:none}
+      .navlinks{display:none}
       .hero{padding:36px 20px;border-radius:24px}
       h1{font-size:2.2rem}
       .grid,.steps{grid-template-columns:1fr}
@@ -266,7 +265,7 @@
       .section-head p{margin-top:6px}
       .actions{flex-direction:column}
       .btn{width:100%}
-      .brand-logo{height:42px;max-width:110px}.brand-name{font-size:.86rem}
+      .brand-logo{height:48px;max-width:125px}
       .hero-art{min-height:300px}
     }
   </style>
@@ -327,14 +326,18 @@
   <script src="assets/age-gate.js"></script>
 </head>
 <body>
+<svg aria-hidden="true" width="0" height="0" style="position:absolute;overflow:hidden" xmlns="http://www.w3.org/2000/svg">
+  <filter id="bonvi-clear-paper" color-interpolation-filters="sRGB">
+    <feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -1.8 -1.8 -1.8 0 5.05"/>
+  </filter>
+</svg>
 <div class="wrap">
   <nav class="nav">
     <a class="brand-wrap" href="/" aria-label="BON VI MERCAT — volver al inicio">
-      <img class="brand-logo" src="assets/logo-horizontal.png" alt="">
-      <span class="brand-name">BON VI MERCAT</span>
+      <img class="brand-logo" src="assets/logo-horizontal.png" alt="BON VI MERCAT">
     </a>
     <div class="navlinks">
-      <a class="nav-home" href="/">Inicio</a>
+      <a href="#bebidas">
       <a href="#bebidas">Bebidas</a>
       <a href="#como-comprar">Cómo comprar</a>
       <a href="#faq">Preguntas frecuentes</a>
