@@ -1,4 +1,48 @@
-# Catálogo SEO — etapa de previsualización privada
+# BON VI — catálogo web separado (Fase 1 aprobada / Fase 2 en desarrollo)
+
+**Criterio definitivo del 07/11/2026:** se trabaja únicamente en la rama
+`desarrollo/catalogo-seo-l7` de `pepem87/bonvi-web`. No se publica en
+`bonvimercat.com.ar`, no se modifica `main`, no se modifica el repositorio
+interno `pepem87/Bonvi-Mercat`, Streamlit ni los datos de Supabase.
+
+**Fase 1: aprobada por el usuario.** Se probó una copia ZIP aislada con 1.541
+fichas, índice, filtros e informe PDF. Se conserva como referencia.
+Las rutas `preview/index.html` y `preview/catalogo-completo.html` en el
+repositorio son maquetas anteriores, no la ZIP final aprobada.
+
+**Fase 2: todavía no terminada.** La sincronización se implementará y probará
+de forma independiente; solo cuando el catálogo web completo se apruebe
+expresamente se preparará su migración al dominio. El catálogo público actual
+de Streamlit sigue disponible hasta entonces.
+
+## Prueba de cambios de catálogo sin conectar ni modificar sistemas internos
+
+El programa `tools/comparar_actualizacion_privada.py` compara los 16 JSON
+originales de Fase 1 con una exportación nueva de **solo datos públicos de
+productos**. No consulta la base, no genera fichas, no despliega ni escribe
+archivos en la web. Detecta altas, bajas, precios, modalidades, nombres y
+orden; todas las diferencias requieren revisión.
+
+```bash
+python tools/comparar_actualizacion_privada.py \
+  --base preview/datos \
+  --nuevo /ruta/privada/productos-vigentes.json \
+  --reporte /ruta/privada/comparacion.json
+```
+
+El nuevo JSON tiene la forma de un arreglo de productos y solo acepta los
+campos autorizados: código, producto, familia, presentación, UxB, modalidad,
+precio persona unitario, orden L7, activo y rol. **No admite costos, márgenes,
+clientes ni claves**. El informe debe guardarse fuera del repositorio.
+
+Las pruebas incluyen una comparación de la referencia real de 1.541
+productos consigo misma (cero cambios), una simulación de cambio de precio,
+altas y bajas, modalidades y rechazo de campos contables internos.
+
+---
+
+## Historial y documentación anterior
+
 
 Este desarrollo vive solo en la rama `desarrollo/catalogo-seo-l7`.
 **No modifica** la página actual, Streamlit, Supabase ni el sitemap público.
@@ -35,7 +79,7 @@ sin revisar contenido y permisos.
 
 ## Fase 1 — réplica del catálogo público (avance del 06/11/2026)
 
-Esta etapa sigue **EN DESARROLLO**, no fue desplegada ni aprobada.
+Esta etapa fue **APROBADA** por el usuario al probar el ZIP aislado. No fue desplegada.
 Se tomó como referencia el archivo original `pages/0_📲_Catalogo_publico.py` de la rama `main` de `Bonvi-Mercat`.
 
 **Incorporado al generador privado `catalogo_indice.py`:**
@@ -55,7 +99,7 @@ Se tomó como referencia el archivo original `pages/0_📲_Catalogo_publico.py` 
 python -m unittest discover -s tools -p 'test_*.py'
 ```
 
-**Pendiente de aprobar Fase 1:** generar una salida real con copia local de ambos repositorios y conexión de solo lectura; ejecutar las pruebas Python; comparar lado a lado con Streamlit en móvil y escritorio; verificar las ocho ilustraciones, fotografías de categoría, modalidades excepcionales, redondeos, orden y PDF; resolver diferencias encontradas.
+**Historial de pendientes anterior a la aprobación del ZIP:** generar una salida real con copia local de ambos repositorios y conexión de solo lectura; ejecutar las pruebas Python; comparar lado a lado con Streamlit en móvil y escritorio; verificar las ocho ilustraciones, fotografías de categoría, modalidades excepcionales, redondeos, orden y PDF; resolver diferencias encontradas.
 
 **No hacer todavía:** sincronizar mediante tareas periódicas, unir la rama a `main`, alterar Supabase/Streamlit, crear fichas indexables ni actualizar `sitemap.xml`.
 
