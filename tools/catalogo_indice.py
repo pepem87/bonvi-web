@@ -45,6 +45,7 @@ def public_product(item):
             "unitario": float(offer["precio_unitario_referencia"]),
             "imagen": verified_image(item),
             "imagen_categoria": category_image(item),
+            "icono_categoria": str(item.get("icono_categoria") or "🍾"),
             "slug": slug(str(item["producto"])) + "-" + slug(str(item["codigo"]))}
 
 def index_html(products, pdf_path=None, search_aliases=None, category_icons=None,
@@ -105,7 +106,7 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 .categories button:hover{border-color:#294a3c}
 .categories button:focus-visible,.pager button:focus-visible,.clear:focus-visible{outline:3px solid #b58b49;outline-offset:2px}
 .grid{display:grid;grid-template-columns:1fr;gap:9px}
-.product{background:#fffdf8;border:1px solid rgba(41,74,60,.14);border-radius:19px;padding:12px;display:grid;grid-template-columns:78px minmax(0,1fr);gap:13px;align-items:center;min-width:0;box-shadow:0 7px 22px rgba(41,74,60,.08)}.product-body{min-width:0;flex:1}.product-photo{width:78px;min-height:112px;border-radius:15px;background:linear-gradient(180deg,#f8f3e9,#e9e2d5);display:grid;place-items:center;overflow:hidden}.product-photo img{width:100%;height:112px;object-fit:cover}.product-photo .fallback{font:12px Georgia,serif;text-align:center;color:#71816f;padding:5px}.product h2{margin:4px 0;line-height:1.15;overflow-wrap:anywhere}
+.product{background:#fffdf8;border:1px solid rgba(41,74,60,.14);border-radius:19px;padding:12px;display:grid;grid-template-columns:78px minmax(0,1fr);gap:13px;align-items:center;min-width:0;box-shadow:0 7px 22px rgba(41,74,60,.08)}.product-body{min-width:0;flex:1}.product-photo{width:78px;min-height:112px;border-radius:15px;background:linear-gradient(180deg,#f8f3e9,#e9e2d5);display:grid;place-items:center;overflow:hidden}.product-photo img{width:100%;height:112px;object-fit:cover}.product-photo .fallback{font:34px Georgia,serif;text-align:center;color:#71816f;padding:5px}.product h2{margin:4px 0;line-height:1.15;overflow-wrap:anywhere}
 .product h2{font:700 17px Georgia,serif}.price{font:800 23px Georgia,serif;color:#174432;margin-top:3px}
 .catname{font-size:11px;font-weight:900;letter-spacing:.08em;color:#8a6c3f;text-transform:uppercase}
 .product-code{font-size:12px;font-weight:800;color:#405e50}.sale-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:8px;margin-top:6px}
@@ -160,7 +161,7 @@ function paint(){
  $("results").innerHTML=visible.map(p=>{
  const bulk=p.tipo==="bulto"&&Number(p.uxb)>1;
  const badge=bulk?"📦 VENTA POR BULTO · x"+p.uxb:"🍾 VENTA POR UNIDAD";
- const fallback='<span class="fallback">BON VI MERCAT<br>Imagen por verificar</span>';
+ const fallback='<span class="fallback">'+esc(p.icono_categoria||"🍾")+'</span>';
  const photo=p.imagen?'<img loading="lazy" alt="'+esc(p.nombre)+'" src="'+esc(p.imagen)+'">':p.imagen_categoria?'<img loading="lazy" alt="Ilustración de categoría '+esc(p.categoria)+'" src="'+esc(p.imagen_categoria)+'">':fallback;
  const reference=bulk?'<div class="unit">Referencia por unidad: '+money(p.unitario)+'</div>':"";
  return '<article class="product"><div class="product-photo">'+photo+'</div><div class="product-body"><div class="catname">'+esc(p.categoria)+'</div><h2><a href="productos/'+encodeURIComponent(p.slug)+'/">'+esc(p.nombre)+'</a></h2><div class="product-code">CÓDIGO '+esc(p.codigo)+'</div><div class="muted">'+(p.presentacion?'Presentación: '+esc(p.presentacion):"")+'</div><div class="sale-row"><span class="sale-badge'+(bulk?' bulk':'')+'">'+badge+'</span><div class="price-wrap"><div class="price-label">Precio '+(bulk?"bulto":"unidad")+'</div><div class="price">'+money(p.precio)+'</div>'+reference+'</div></div></div></article>';
