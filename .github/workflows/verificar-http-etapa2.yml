@@ -1,0 +1,61 @@
+name: Verificar publicacion BON VI real despues del lanzamiento
+on:
+  push:
+    branches:
+      - desarrollo/catalogo-seo-l7
+    paths:
+      - '.deployment_parts/VERIFICAR_HTTP_ETAPA2'
+permissions:
+  contents: read
+jobs:
+  postdeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirmar contenido actualizado en el dominio real
+        run: |
+          set -euo pipefail
+          base="https://bonvimercat.com.ar"
+          valid=0
+          for i in $(seq 1 15); do
+            curl -fsSL --connect-timeout 12 --max-time 40 "$base/" -o /tmp/home.html || true
+            curl -fsSL --connect-timeout 12 --max-time 40 "$base/catalogo/" -o /tmp/catalogo.html || true
+            if grep -q 'href="catalogo/?categoria=OTROS"' /tmp/home.html && \
+               grep -q 'href="catalogo/?categoria=APERITIVOS"' /tmp/home.html && \
+               grep -q 'content="index,follow"' /tmp/catalogo.html && \
+               ! grep -q 'content="noindex,nofollow"' /tmp/catalogo.html; then
+                valid=1
+                break
+            fi
+            echo "Esperando a que GitHub Pages sirva la version nueva - intento $i"
+            sleep 10
+          done
+          test "$valid" -eq 1
+          grep -q 'URLSearchParams(window.location.search)' /tmp/catalogo.html
+          ! grep -q 'bonvi-mercat-6qpnhhbkm35bv8pcrywzmq.streamlit.app/Catalogo_publico' /tmp/home.html
+          echo "Portada + catalogo SEO publicados y enlazados en dominio REAL."
+      - name: Comprobar Gin, Otros, ficha, PDF y sitemap
+        run: |
+          set -euo pipefail
+          base="https://bonvimercat.com.ar"
+          curl -fsSL "$base/gin-la-plata/" -o /tmp/gin.html
+          grep -q 'href="../catalogo/?categoria=APERITIVOS"' /tmp/gin.html
+          curl -fsSL "$base/catalogo/categorias/cuidado-personal-y-hogar/" -o /tmp/otros.html
+          grep -q 'name="robots" content="index,follow"' /tmp/otros.html
+          curl -fsSL "$base/catalogo/categorias/gin/" -o /tmp/gin-category.html
+          grep -q 'name="robots" content="index,follow"' /tmp/gin-category.html
+          curl -fsSL "$base/catalogo/productos/911-cabernet-sauvignon-1883/" -o /tmp/producto.html
+          grep -q 'name="robots" content="index,follow"' /tmp/producto.html
+          curl -fsSL "$base/catalogo/catalogo-personas.pdf" -o /tmp/catalogo.pdf
+          test "$(sha256sum /tmp/catalogo.pdf | cut -d' ' -f1)" = "6a8f2a3256b1bf6119228be130ad1e60e48d80aaee451912d861178d7fb2c120"
+          curl -fsSL "$base/sitemap.xml" -o /tmp/sitemap.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse('/tmp/sitemap.xml').getroot()
+          urls = [el.text for el in root.iter() if el.tag.endswith('}loc')]
+          assert len(urls) == 1564, len(urls)
+          assert len(set(urls)) == len(urls)
+          assert 'https://bonvimercat.com.ar/catalogo/' in urls
+          assert 'https://bonvimercat.com.ar/catalogo/categorias/cuidado-personal-y-hogar/' in urls
+          print('SITEMAP PUBLICADO:',len(urls),'URLs sin duplicados')
+          PY
+          echo "VERIFICACION COMPLETA: PDF original, fichas, categorias y sitemap en dominio real."
