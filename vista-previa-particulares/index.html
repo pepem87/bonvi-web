@@ -280,6 +280,19 @@
     .catalog-secondary{color:#fff!important;background:transparent!important;border:1px solid #d8c29a!important;padding:12px 15px!important;font-size:.9rem;white-space:nowrap}
     .hero-whatsapp{color:#f8ead1;font-size:.84rem;text-decoration:underline;text-underline-offset:4px;font-weight:700}
     @media(max-width:620px){.hero-cta-stack{max-width:none}.hero-cta-bottom{flex-direction:column;align-items:stretch}.catalog-secondary{width:100%}.hero-whatsapp{text-align:center;padding:5px 0}}
+
+    /* Home V2: barra superior limpia, navegación sobria e iconografía lineal */
+    .topbar{display:flex;justify-content:space-between;gap:14px;padding:9px max(22px,calc((100vw - 1160px)/2 + 18px));background:#fffaf1;border-bottom:1px solid #e0d5c4;color:#496354;font:500 12px system-ui,sans-serif}
+    .topbar-links{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+    .topbar a{color:#294a3c;text-decoration:none}
+    .topbar a:hover{text-decoration:underline}
+    .topbar-dot{color:#c9b48c}
+    .nav{background:rgba(255,250,241,.96);border-radius:15px;box-shadow:0 5px 18px rgba(23,61,49,.045);padding:10px 18px}
+    .navlinks{gap:20px}
+    .navlinks a{font-size:.84rem}
+    .icon-elegant{font-size:inherit!important;display:grid;place-items:center;width:60px;height:60px;margin:0 auto 12px;background:rgba(181,139,73,.09);border:1px solid rgba(181,139,73,.22);border-radius:50%}
+    .icon-elegant svg{width:38px;height:38px;fill:none;stroke:#9c7b45;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+    @media(max-width:700px){.topbar{padding:9px 16px;flex-direction:column;text-align:center;gap:5px}.topbar-links{justify-content:center}.nav{position:relative;top:auto}.navlinks{gap:10px;justify-content:center}.navlinks a{font-size:.77rem}}
   </style>
 
   <script type="application/ld+json">
@@ -339,16 +352,17 @@
 </head>
 <body>
 
+<div class="topbar"><span>La Plata y alrededores · Entregas programadas</span><div class="topbar-links"><a href="https://www.instagram.com/bonvimercat/" target="_blank" rel="noopener noreferrer">Instagram @bonvimercat</a><span class="topbar-dot">·</span><a href="https://wa.me/5492216816892">WhatsApp</a></div></div>
 <div class="wrap">
   <nav class="nav">
     <a class="brand-wrap" href="/" aria-label="BON VI MERCAT — volver al inicio">
       <img class="brand-logo" src="https://bonvimercat.com.ar/assets/logo-transparent-bonvi.svg" alt="BON VI MERCAT">
     </a>
     <div class="navlinks">
-      <a href="#bebidas">Bebidas</a>
+      <a href="https://bonvimercat.com.ar/">Inicio</a>
+      <a href="https://bonvimercat.com.ar/catalogo/">Catálogo</a>
       <a href="#como-comprar">Cómo comprar</a>
       <a href="#faq">Preguntas frecuentes</a>
-      <a href="https://www.instagram.com/bonvimercat/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
     </div>
   </nav>
 
@@ -382,23 +396,23 @@
 
   <section class="section" id="bebidas">
     <div class="section-head">
-      <div><h2>Encontrá lo que estás buscando</h2></div>
+      <div><h2>Explorá nuestras bebidas</h2></div>
       <p>Una selección para reuniones, comidas, regalos, celebraciones o simplemente para tener algo bueno en casa.</p>
     </div>
 
     <div class="grid">
-      <div class="card"><div class="icon">🍷</div><h3>Vinos y champagnes</h3><p>Malbec, Cabernet, blends, blancos, espumantes y distintas etiquetas para cada ocasión.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=VINOS">Ver vinos en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/vinos-la-plata/">Más sobre vinos en La Plata</a></div>
-      <div class="card"><div class="icon">🍺</div><h3>Cervezas</h3><p>Opciones y distintas presentaciones según disponibilidad.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=CERVEZAS">Ver cervezas en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/cervezas-la-plata/">Más sobre cervezas en La Plata</a></div>
-      <div class="card"><div class="icon">🥃</div><h3>Whisky y licores</h3><p>Alternativas para distintos gustos, ocasiones y presupuestos.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=WHISKYS">Ver whisky en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/whisky-la-plata/">Más sobre whisky en La Plata</a></div>
-      <div class="card"><div class="icon">🍸</div><h3>Gin y aperitivos</h3><p>Gin, fernet, vermut y aperitivos según la lista vigente.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=APERITIVOS">Ver aperitivos en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/gin-la-plata/">Más sobre gin en La Plata</a></div>
+      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6h24v12c0 7-5 13-12 13S12 25 12 18V6Zm12 25v11m-10 0h20M12 17h24"/></svg></div><h3>Vinos y champagnes</h3><p>Malbec, Cabernet, blends, blancos, espumantes y distintas etiquetas para cada ocasión.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=VINOS">Ver vinos en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/vinos-la-plata/">Más sobre vinos en La Plata</a></div>
+      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 13h24v27H10zM34 17h4c8 0 7 15-4 15M10 22h24M16 7c-4 2-4 6 0 8m9-8c-4 2-4 6 0 8"/></svg></div><h3>Cervezas</h3><p>Opciones y distintas presentaciones según disponibilidad.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=CERVEZAS">Ver cervezas en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/cervezas-la-plata/">Más sobre cervezas en La Plata</a></div>
+      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 13h30l-3 28H12L9 13Zm3 13h24m-18 0 4 5 6-6 5 6"/></svg></div><h3>Whisky y licores</h3><p>Alternativas para distintos gustos, ocasiones y presupuestos.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=WHISKYS">Ver whisky en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/whisky-la-plata/">Más sobre whisky en La Plata</a></div>
+      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m7 13 17 17 17-17H7Zm17 17v12m-10 0h20M31 7l8 8M10 9c3-2 6-2 9 0"/></svg></div><h3>Gin y aperitivos</h3><p>Gin, fernet, vermut y aperitivos según la lista vigente.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=APERITIVOS">Ver aperitivos en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/gin-la-plata/">Más sobre gin en La Plata</a></div>
       
     </div>
 
     <div class="secondary-products">
       <strong>También encontrá aceites de oliva, acetos y otros productos</strong>
       <div class="chips">
-        <a class="chip" href="https://bonvimercat.com.ar/catalogo/?categoria=ACEITES">🫒 Aceites y acetos</a>
-        <a class="chip" href="https://bonvimercat.com.ar/catalogo/?categoria=OTROS">🛍️ Cuidado personal y hogar</a>
+        <a class="chip" href="https://bonvimercat.com.ar/catalogo/?categoria=ACEITES">Aceites y acetos</a>
+        <a class="chip" href="https://bonvimercat.com.ar/catalogo/?categoria=OTROS">Cuidado personal y hogar</a>
       </div>
     </div>
   </section>
