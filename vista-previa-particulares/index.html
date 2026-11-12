@@ -282,17 +282,19 @@
     @media(max-width:620px){.hero-cta-stack{max-width:none}.hero-cta-bottom{flex-direction:column;align-items:stretch}.catalog-secondary{width:100%}.hero-whatsapp{text-align:center;padding:5px 0}}
 
     /* Home V2: barra superior limpia, navegación sobria e iconografía lineal */
-    .topbar{display:flex;justify-content:space-between;gap:14px;padding:9px max(22px,calc((100vw - 1160px)/2 + 18px));background:#fffaf1;border-bottom:1px solid #e0d5c4;color:#496354;font:500 12px system-ui,sans-serif}
+    .header-right{display:flex;flex:1;min-width:0;flex-direction:column;align-items:flex-end;gap:12px}
+    .topbar{display:flex;align-items:center;justify-content:flex-end;gap:16px;flex-wrap:wrap;color:#496354;font:500 11px system-ui,sans-serif;width:100%;padding:0 0 9px;border-bottom:1px solid #eadfce}
     .topbar-links{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
     .topbar a{color:#294a3c;text-decoration:none}
     .topbar a:hover{text-decoration:underline}
     .topbar-dot{color:#c9b48c}
-    .nav{background:rgba(255,250,241,.96);border-radius:15px;box-shadow:0 5px 18px rgba(23,61,49,.045);padding:10px 18px}
-    .navlinks{gap:20px}
+    .nav{background:rgba(255,250,241,.96);border-radius:15px;box-shadow:0 5px 18px rgba(23,61,49,.045);padding:16px 22px;gap:22px}
+    .navlinks{display:flex;gap:20px;justify-content:flex-end;flex-wrap:wrap}
     .navlinks a{font-size:.84rem}
     .icon-elegant{font-size:inherit!important;display:grid;place-items:center;width:60px;height:60px;margin:0 auto 12px;background:rgba(181,139,73,.09);border:1px solid rgba(181,139,73,.22);border-radius:50%}
     .icon-elegant svg{width:38px;height:38px;fill:none;stroke:#9c7b45;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
-    @media(max-width:700px){.topbar{padding:9px 16px;flex-direction:column;text-align:center;gap:5px}.topbar-links{justify-content:center}.nav{position:relative;top:auto}.navlinks{gap:10px;justify-content:center}.navlinks a{font-size:.77rem}}
+    @media(max-width:920px){.nav{flex-wrap:wrap;justify-content:center}.header-right{flex-basis:100%;align-items:center}.topbar{justify-content:center;text-align:center}.navlinks{justify-content:center}}
+    @media(max-width:700px){.nav{position:relative;top:auto}.topbar{flex-direction:column;gap:5px;padding-bottom:8px}.topbar-links{justify-content:center}.navlinks{display:flex;gap:12px;justify-content:center}.navlinks a{font-size:.77rem}}
   </style>
 
   <script type="application/ld+json">
@@ -352,17 +354,19 @@
 </head>
 <body>
 
-<div class="topbar"><span>La Plata y alrededores · Entregas programadas</span><div class="topbar-links"><a href="https://www.instagram.com/bonvimercat/" target="_blank" rel="noopener noreferrer">Instagram @bonvimercat</a><span class="topbar-dot">·</span><a href="https://wa.me/5492216816892">WhatsApp</a></div></div>
 <div class="wrap">
   <nav class="nav">
     <a class="brand-wrap" href="/" aria-label="BON VI MERCAT — volver al inicio">
       <img class="brand-logo" src="https://bonvimercat.com.ar/assets/logo-transparent-bonvi.svg" alt="BON VI MERCAT">
     </a>
-    <div class="navlinks">
-      <a href="https://bonvimercat.com.ar/">Inicio</a>
-      <a href="https://bonvimercat.com.ar/catalogo/">Catálogo</a>
-      <a href="#como-comprar">Cómo comprar</a>
-      <a href="#faq">Preguntas frecuentes</a>
+    <div class="header-right">
+      <div class="topbar"><span>La Plata y alrededores · Entregas programadas</span><div class="topbar-links"><a href="https://www.instagram.com/bonvimercat/" target="_blank" rel="noopener noreferrer">Instagram @bonvimercat</a><span class="topbar-dot">·</span><a href="https://wa.me/5492216816892">WhatsApp</a></div></div>
+      <div class="navlinks">
+        <a href="https://bonvimercat.com.ar/">Inicio</a>
+        <a href="https://bonvimercat.com.ar/catalogo/">Catálogo</a>
+        <a href="#como-comprar">Cómo comprar</a>
+        <a href="#faq">Preguntas frecuentes</a>
+      </div>
     </div>
   </nav>
 
@@ -402,8 +406,8 @@
 
     <div class="grid">
       <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M12 6h24v12c0 7-5 13-12 13S12 25 12 18V6Zm12 25v11m-10 0h20M12 17h24"/></svg></div><h3>Vinos y champagnes</h3><p>Malbec, Cabernet, blends, blancos, espumantes y distintas etiquetas para cada ocasión.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=VINOS">Ver vinos en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/vinos-la-plata/">Más sobre vinos en La Plata</a></div>
-      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 13h24v27H10zM34 17h4c8 0 7 15-4 15M10 22h24M16 7c-4 2-4 6 0 8m9-8c-4 2-4 6 0 8"/></svg></div><h3>Cervezas</h3><p>Opciones y distintas presentaciones según disponibilidad.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=CERVEZAS">Ver cervezas en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/cervezas-la-plata/">Más sobre cervezas en La Plata</a></div>
-      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 13h30l-3 28H12L9 13Zm3 13h24m-18 0 4 5 6-6 5 6"/></svg></div><h3>Whisky y licores</h3><p>Alternativas para distintos gustos, ocasiones y presupuestos.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=WHISKYS">Ver whisky en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/whisky-la-plata/">Más sobre whisky en La Plata</a></div>
+      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M11 16h25v24H13a2 2 0 0 1-2-2V16Zm25 5h4c9 0 7 13-4 13M16 23v11m7-11v11m7-11v11" /><path d="M11 16c-3-3-1-8 3-8 2-5 9-5 11-1 5-3 10 1 9 6 3 1 4 3 2 5H11Z" fill="#fffaf1"/><path d="M16 15v4m10-4v5"/></svg></div><h3>Cervezas</h3><p>Opciones y distintas presentaciones según disponibilidad.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=CERVEZAS">Ver cervezas en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/cervezas-la-plata/">Más sobre cervezas en La Plata</a></div>
+      <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M9 15h30l-3 26H12L9 15Zm2 13h26"/><path d="m17 24 6-4 4 6-6 4-4-6Zm8 7 6-4 4 6-6 4-4-6Z"/></svg></div><h3>Whisky y licores</h3><p>Alternativas para distintos gustos, ocasiones y presupuestos.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=WHISKYS">Ver whisky en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/whisky-la-plata/">Más sobre whisky en La Plata</a></div>
       <div class="card"><div class="icon icon-elegant"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="m7 13 17 17 17-17H7Zm17 17v12m-10 0h20M31 7l8 8M10 9c3-2 6-2 9 0"/></svg></div><h3>Gin y aperitivos</h3><p>Gin, fernet, vermut y aperitivos según la lista vigente.</p><a class="card-link" href="https://bonvimercat.com.ar/catalogo/?categoria=APERITIVOS">Ver aperitivos en el catálogo →</a><a class="seo-link" href="https://bonvimercat.com.ar/gin-la-plata/">Más sobre gin en La Plata</a></div>
       
     </div>
