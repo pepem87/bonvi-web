@@ -295,6 +295,10 @@
     .icon-elegant svg{width:38px;height:38px;fill:none;stroke:#9c7b45;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
     @media(max-width:920px){.nav{flex-wrap:wrap;justify-content:center}.header-right{flex-basis:100%;align-items:center}.topbar{justify-content:center;text-align:center}.navlinks{justify-content:center}}
     @media(max-width:700px){.nav{position:relative;top:auto}.topbar{flex-direction:column;gap:5px;padding-bottom:8px}.topbar-links{justify-content:center}.navlinks{display:flex;gap:12px;justify-content:center}.navlinks a{font-size:.77rem}}
+    /* Vista previa V2: cuatro categorías equilibradas en dos filas de dos tarjetas */
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .grid>.card,.grid>.card:nth-child(4),.grid>.card:nth-child(5),.grid>.card:last-child:nth-child(odd){grid-column:auto}
+    @media(max-width:620px){.grid{grid-template-columns:1fr}}
   </style>
 
   <script type="application/ld+json">
