@@ -42,6 +42,21 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 .wa{background:#218b5b}.ig{background:linear-gradient(135deg,#7844ba,#c83282,#e6a04e)}
 .float svg,nav svg,footer svg{width:24px;height:24px}.empty{text-align:center;color:#657369;padding:25px}
 @media(max-width:700px){.product-photo{width:66px;min-height:104px}.product-photo img{height:104px}.product{padding:10px;grid-template-columns:66px minmax(0,1fr);gap:10px}.filters{grid-template-columns:1fr}.categories{grid-template-columns:repeat(2,1fr)}.searchrow{grid-template-columns:1fr}.sale-row{display:block}.price-wrap{text-align:left;margin:9px 0 0}.pager{flex-wrap:wrap}.pager span{order:-1;width:100%;text-align:center}}
+
+/* BON VI · Etapa 3: encabezado liviano y aclaración discreta de referencia unitaria */
+.catalog-header{background:#fffaf1;color:#173d31;border-bottom:1px solid #ded2bf;padding:0 18px;box-shadow:0 5px 18px #1b2f2410}
+.header-inner{max-width:1160px;margin:auto;width:100%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;padding:12px 0}
+.catalog-header a{color:#173d31}
+.catalog-header .brand img{height:64px;max-width:205px}
+.header-links{display:flex;align-items:center;flex-wrap:wrap;gap:24px}
+.header-links a{font-size:14px;font-weight:700;padding:12px 0}
+.header-links .active{border-bottom:2px solid #b58b49;color:#85683c}
+.price-info{position:relative;display:inline-flex;vertical-align:middle;margin-left:3px}
+.info-trigger{width:18px;height:18px;border:1px solid #9c8664;border-radius:50%;display:inline-grid;place-items:center;background:#f7eee0;color:#785f37;font:700 11px Georgia,serif;cursor:pointer;line-height:1;padding:0}
+.info-trigger:focus-visible{outline:2px solid #b58b49;outline-offset:2px}
+.price-tooltip{display:none;position:absolute;right:0;bottom:calc(100% + 8px);width:min(265px,70vw);background:#173d31;color:#fffaf1;border-radius:10px;padding:11px 13px;box-shadow:0 8px 24px #0003;font:12px/1.5 system-ui,sans-serif;text-align:left;z-index:40}
+.price-info:hover .price-tooltip,.price-info:focus-within .price-tooltip,.price-info.is-open .price-tooltip{display:block}
+@media(max-width:700px){.header-inner{justify-content:center;gap:6px;padding:10px 0}.catalog-header .brand img{height:48px}.header-links{gap:13px;justify-content:center}.header-links a{font-size:12px;padding:8px 0}}
 </style><meta name="description" content="Conocé el catálogo de BON VI MERCAT en La Plata: vinos, champagnes, cervezas, aperitivos, whiskys, aceites y acetos. Consultá precios por bulto o unidad.">
 <link rel="canonical" href="https://bonvimercat.com.ar/catalogo/">
 <meta property="og:locale" content="es_AR">
@@ -52,7 +67,7 @@ h1{font:700 clamp(30px,6vw,45px) Georgia,serif;margin:8px}
 <meta name="twitter:card" content="summary">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"BON VI MERCAT","url":"https://bonvimercat.com.ar/catalogo/","inLanguage":"es-AR"}</script>
 </head><body>
-<header><a class="brand" href="/" aria-label="BON VI MERCAT — volver al inicio"><img src="../assets/logo-transparent-bonvi.svg" alt="BON VI MERCAT"></a><nav><a href="/">Inicio</a><a aria-label="WhatsApp" href="https://wa.me/5492216816892">WhatsApp</a><a aria-label="Instagram" href="https://www.instagram.com/bonvimercat/">Instagram</a></nav></header>
+<header class="catalog-header"><div class="header-inner"><a class="brand" href="/" aria-label="BON VI MERCAT — volver al inicio"><img src="../assets/logo-transparent-bonvi.svg" alt="BON VI MERCAT"></a><nav class="header-links" aria-label="Navegación principal"><a href="/">Inicio</a><a class="active" href="/catalogo/" aria-current="page">Catálogo</a><a href="https://www.instagram.com/bonvimercat/" target="_blank" rel="noopener noreferrer">Instagram</a><a href="https://wa.me/5492216816892" target="_blank" rel="noopener noreferrer">WhatsApp</a></nav></div></header>
 <main class="wrap"><section class="hero"><img class="hero-logo" alt="BON VI MERCAT" src="assets/logo_bon_vi_mercat.png"><div class="muted">BUENAS BEBIDAS · MEJORES ENCUENTROS</div><h1>CATÁLOGO ACTUALIZADO</h1><div class="hero-meta"><strong>Vigente hasta 06/11/2026</strong> · 1541 productos</div></section>
 <section class="panel pdf"><div><strong>¿Preferís la lista completa?</strong><div class="muted">Catálogo en PDF</div></div><a class="download" href="catalogo-personas.pdf" download>Descargar catálogo PDF ↓</a></section>
 <section class="panel"><h2>¿Qué estás buscando?</h2><p class="muted">Buscá por código, marca o producto.</p>
@@ -112,8 +127,8 @@ function paint(){
  const badge=bulk?"📦 VENTA POR BULTO · x"+p.uxb:"🍾 VENTA POR UNIDAD";
  const fallback='<span class="fallback">'+esc(p.icono_categoria||"🍾")+'</span>';
  const photo=p.imagen?'<img loading="lazy" alt="'+esc(p.nombre)+'" src="'+esc(p.imagen)+'">':p.imagen_categoria?'<img loading="lazy" alt="Ilustración de categoría '+esc(p.categoria)+'" src="'+esc(p.imagen_categoria)+'">':fallback;
- const reference=bulk?'<div class="unit">Referencia por unidad: '+money(p.unitario)+'</div>':"";
- return '<article class="product"><div class="product-photo">'+photo+'</div><div class="product-body"><div class="catname">'+esc(p.categoria)+'</div><h2><a href="productos/'+encodeURIComponent(p.slug)+'/index.html">'+esc(p.nombre)+'</a></h2><div class="product-code">CÓDIGO '+esc(p.codigo)+'</div><div class="muted">'+(p.presentacion?'Presentación: '+esc(p.presentacion):"")+'</div><div class="sale-row"><span class="sale-badge'+(bulk?' bulk':'')+'">'+badge+'</span><div class="price-wrap"><div class="price-label">Precio '+(bulk?"bulto":"unidad")+'</div><div class="price">'+money(p.precio)+'</div>'+reference+'</div></div></div></article>';
+ const reference=bulk?'<div class="unit">Referencia por unidad: '+money(p.unitario)+' <span class="price-info"><button type="button" class="info-trigger" aria-label="Información del precio por unidad" aria-expanded="false" title="Información del precio">i</button><span class="price-tooltip" role="tooltip">El precio publicado corresponde al bulto completo. El valor por unidad es informativo y no implica venta individual.</span></span></div>':"";
+ return '<article class="product"><div class="product-photo">'+photo+'</div><div class="product-body"><div class="catname">'+esc(p.categoria)+'</div><h2><a href="productos/'+encodeURIComponent(p.slug)+'/index.html">'+esc(p.nombre)+'</a></h2><div class="product-code">CÓDIGO '+esc(p.codigo)+'</div><div class="muted">'+(p.presentacion?'Presentación: '+esc(p.presentacion):"")+'</div><div class="sale-row"><span class="sale-badge'+(bulk?' bulk':'')+'">'+badge+'</span><div class="price-wrap"><div class="price-label">'+(bulk?"Precio bulto x"+p.uxb:"Precio por unidad")+'</div><div class="price">'+money(p.precio)+'</div>'+reference+'</div></div></div></article>';
  }).join("");
  const started=Boolean($("search").value.trim()||$("category").value||$("brand").value||$("range").value!=="TODOS"||$("pricetype").value!=="unitario");
  $("count").textContent=started?filtered.length+" producto(s) encontrado(s)"+(filtered.length?" · Mostrando "+(start+1)+"–"+(start+visible.length):""):"Buscá o seleccioná una categoría para comenzar.";
@@ -139,6 +154,8 @@ function render(){
  $("selection").textContent="Selección actual: "+(cat||"Todas las categorías")+" · "+range+" · "+(basis==="unitario"?"por unidad":"por presentación de venta")+" · "+(brand||"Todas las marcas")+" · "+$("sort").selectedOptions[0].text;
  paint();
 }
+document.addEventListener("click",event=>{const trigger=event.target.closest(".info-trigger");document.querySelectorAll(".price-info.is-open").forEach(box=>{if(!trigger||!box.contains(trigger)){box.classList.remove("is-open");const btn=box.querySelector(".info-trigger");if(btn)btn.setAttribute("aria-expanded","false")}});if(trigger){event.preventDefault();const box=trigger.closest(".price-info");const open=!box.classList.contains("is-open");box.classList.toggle("is-open",open);trigger.setAttribute("aria-expanded",String(open))}});
+document.addEventListener("keydown",event=>{if(event.key==="Escape"){document.querySelectorAll(".price-info.is-open").forEach(box=>{box.classList.remove("is-open");box.querySelector(".info-trigger")?.setAttribute("aria-expanded","false")})}});
 document.querySelectorAll("[data-cat]").forEach(b=>b.addEventListener("click",()=>{$("category").value=$("category").value===b.dataset.cat?"":b.dataset.cat;render()}));
 ["search","category","brand","range","pricetype","sort"].forEach(id=>$(id).addEventListener("input",render));
 $("clear").addEventListener("click",()=>{$("search").value="";$("category").value="";$("brand").value="";$("range").value="TODOS";$("pricetype").value="unitario";$("sort").value="default";render()});
