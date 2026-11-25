@@ -1,0 +1,80 @@
+name: Publicar L7 aprobada inmediatamente
+on:
+  repository_dispatch:
+    types: [bonvi-l7-aprobada]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: bonvi-web-l7-publication
+  cancel-in-progress: false
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    env:
+      BONVI_SUPABASE_URL: ${{ secrets.BONVI_SUPABASE_URL }}
+      BONVI_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.BONVI_SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Checkout de la web pública
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Instalar dependencias fijadas
+        run: python -m pip install -r scripts/catalog-requirements.txt
+      - name: Verificar secrets de sincronización
+        run: |
+          test -n "$BONVI_SUPABASE_URL" || (echo 'Falta BONVI_SUPABASE_URL en secrets' && exit 1)
+          test -n "$BONVI_SUPABASE_SERVICE_ROLE_KEY" || (echo 'Falta BONVI_SUPABASE_SERVICE_ROLE_KEY en secrets' && exit 1)
+      - name: Leer exclusivamente datos públicos de la L7 aprobada
+        id: export
+        env:
+          EVENT_L7_ID: ${{ github.event.client_payload.l7_id || '0' }}
+        run: |
+          python scripts/fetch_approved_snapshot.py \
+            --snapshot "$RUNNER_TEMP/catalogo_snapshot.json" \
+            --fingerprint "$RUNNER_TEMP/catalogo_fingerprint.json" \
+            --expected-id "$EVENT_L7_ID" \
+            --existing-marker catalogo/version-l7.json
+      - name: Generar catálogo y PDF en el checkout
+        if: steps.export.outputs.update == 'true'
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 python scripts/sync_catalog.py \
+            --root . \
+            --snapshot "$RUNNER_TEMP/catalogo_snapshot.json" \
+            --report "$RUNNER_TEMP/catalogo_report.json"
+      - name: Verificar alcance del cambio y revalidar datos
+        if: steps.export.outputs.update == 'true'
+        env:
+          EVENT_L7_ID: ${{ github.event.client_payload.l7_id || '0' }}
+        run: |
+          python scripts/fetch_approved_snapshot.py \
+            --snapshot "$RUNNER_TEMP/catalogo_snapshot.json" \
+            --fingerprint "$RUNNER_TEMP/catalogo_fingerprint.json" \
+            --expected-id "$EVENT_L7_ID" \
+            --verify
+          git add -A -- catalogo sitemap.xml
+          git diff --cached --check
+          if git diff --cached --name-only | grep -vE '^(catalogo/|sitemap\.xml$)'; then
+            echo 'Hay cambios fuera del catálogo público'; exit 1
+          fi
+          # Nunca publicar scripts ni snapshots temporales.
+          if git status --porcelain --untracked-files=all | grep -E '\.json\.tmp|snapshot\.json'; then
+            echo 'Snapshot temporal en el checkout'; exit 1
+          fi
+      - name: Publicar un único commit de catálogo en main
+        if: steps.export.outputs.update == 'true'
+        run: |
+          if git diff --cached --quiet; then
+            echo 'Sin diferencias para publicar'; exit 0
+          fi
+          git config user.name 'bonvi-catalog-bot'
+          git config user.email 'bonvi-catalog-bot@users.noreply.github.com'
+          git commit -m "Publicar catálogo L7 aprobada"
+          git push origin HEAD:main
+      - name: Resumen de conciliación
+        if: steps.export.outputs.update == 'true'
+        run: cat "$RUNNER_TEMP/catalogo_report.json" >> "$GITHUB_STEP_SUMMARY"
