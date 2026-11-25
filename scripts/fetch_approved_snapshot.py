@@ -15,12 +15,16 @@ PAGE_SIZE = 500
 
 def api_get(resource, query):
     url = os.environ.get("BONVI_SUPABASE_URL", "").rstrip("/")
-    key = os.environ.get("BONVI_SUPABASE_SERVICE_ROLE_KEY", "")
+    key = os.environ.get("BONVI_SUPABASE_SECRET_KEY", "")
     if not url or not key:
-        raise RuntimeError("Faltan secretos de lectura BONVI_SUPABASE_URL / BONVI_SUPABASE_SERVICE_ROLE_KEY")
+        raise RuntimeError("Faltan secretos de lectura BONVI_SUPABASE_URL / BONVI_SUPABASE_SECRET_KEY")
+    if not key.startswith("sb_secret_"):
+        raise RuntimeError("La sincronización requiere una secret key moderna de Supabase")
     endpoint = url + API + resource + "?" + urlencode(query)
+    # Las secret keys sb_secret_ no son JWT: usar solo el header apikey.
+    # No enviar Authorization: Bearer ni copiar la clave a los logs.
     request = Request(endpoint, headers={
-        "apikey": key, "Authorization": "Bearer " + key,
+        "apikey": key,
         "Accept": "application/json", "User-Agent": "bonvi-approved-l7-publisher/1.0"
     })
     with urlopen(request, timeout=40) as response:
