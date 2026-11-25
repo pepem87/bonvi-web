@@ -10,6 +10,30 @@ m=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(m)
 
 class PublicacionL7(TestCase):
+    def test_secret_key_moderno_se_envia_solo_como_apikey(self):
+        import json, os
+        from unittest.mock import MagicMock
+        response = MagicMock()
+        response.__enter__.return_value = response
+        response.read.return_value = b"[]"
+        with patch.dict(os.environ,{
+            "BONVI_SUPABASE_URL":"https://proyecto.supabase.co",
+            "BONVI_SUPABASE_SECRET_KEY":"sb_secret_CLAVE_DE_PRUEBA"
+        }), patch.object(m,"urlopen",return_value=response) as called:
+            self.assertEqual(m.api_get("productos",{"limit":1}), [])
+        request = called.call_args.args[0]
+        self.assertEqual(request.get_header("Apikey"),"sb_secret_CLAVE_DE_PRUEBA")
+        self.assertIsNone(request.get_header("Authorization"))
+
+    def test_no_aceptar_clave_legacy_en_este_publicador(self):
+        import os
+        with patch.dict(os.environ,{
+            "BONVI_SUPABASE_URL":"https://proyecto.supabase.co",
+            "BONVI_SUPABASE_SECRET_KEY":"eyJ...legacy"
+        }):
+            with self.assertRaises(RuntimeError):
+                m.api_get("productos",{"limit":1})
+
     def test_aprobada_filtro_y_precio_personas(self):
         def fake(resource,query):
             if resource=="cargas_l7": return [{"id":20,"estado":"APROBADA","vigencia":"2026-11-27T18:08:07Z"}]
