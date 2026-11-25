@@ -14,7 +14,7 @@ jobs:
     env:
       BONVI_GITHUB_WEB_TOKEN: ${{ secrets.BONVI_GITHUB_WEB_TOKEN }}
       BONVI_SUPABASE_URL: ${{ secrets.BONVI_SUPABASE_URL }}
-      BONVI_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.BONVI_SUPABASE_SERVICE_ROLE_KEY }}
+      BONVI_SUPABASE_SECRET_KEY: ${{ secrets.BONVI_SUPABASE_SECRET_KEY }}
     steps:
       - name: Checkout de la web pública
         uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
         run: |
           test -n "$BONVI_GITHUB_WEB_TOKEN" || (echo 'Falta BONVI_GITHUB_WEB_TOKEN' && exit 1)
           test -n "$BONVI_SUPABASE_URL" || (echo 'Falta BONVI_SUPABASE_URL en secrets' && exit 1)
-          test -n "$BONVI_SUPABASE_SERVICE_ROLE_KEY" || (echo 'Falta BONVI_SUPABASE_SERVICE_ROLE_KEY en secrets' && exit 1)
+          test -n "$BONVI_SUPABASE_SECRET_KEY" || (echo 'Falta BONVI_SUPABASE_SECRET_KEY en secrets' && exit 1)
       - name: Leer exclusivamente datos públicos de la L7 aprobada
         id: export
         env:
