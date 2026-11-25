@@ -19,6 +19,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          # El mismo token fine-grained que inicia repository_dispatch.
+          # Con GITHUB_TOKEN los pushes NO disparan GitHub Pages.
+          token: ${{ secrets.BONVI_GITHUB_WEB_TOKEN }}
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
@@ -27,6 +30,7 @@ jobs:
         run: python -m pip install -r scripts/catalog-requirements.txt
       - name: Verificar secrets de sincronización
         run: |
+          test -n "${{ secrets.BONVI_GITHUB_WEB_TOKEN }}" || (echo 'Falta BONVI_GITHUB_WEB_TOKEN' && exit 1)
           test -n "$BONVI_SUPABASE_URL" || (echo 'Falta BONVI_SUPABASE_URL en secrets' && exit 1)
           test -n "$BONVI_SUPABASE_SERVICE_ROLE_KEY" || (echo 'Falta BONVI_SUPABASE_SERVICE_ROLE_KEY en secrets' && exit 1)
       - name: Leer exclusivamente datos públicos de la L7 aprobada
@@ -75,6 +79,31 @@ jobs:
           git config user.email 'bonvi-catalog-bot@users.noreply.github.com'
           git commit -m "Publicar catálogo L7 aprobada"
           git push origin HEAD:main
+      - name: Confirmar propagación al dominio público
+        if: steps.export.outputs.update == 'true'
+        run: |
+          python - <<'PY'
+          import json, time
+          from pathlib import Path
+          from urllib.request import Request, urlopen
+          expected = json.loads(Path("catalogo/version-l7.json").read_text())
+          url = "https://bonvimercat.com.ar/catalogo/version-l7.json"
+          for attempt in range(18):
+              try:
+                  with urlopen(Request(url+"?version="+str(expected["l7"]),
+                                       headers={"Cache-Control":"no-cache"}), timeout=10) as resp:
+                      actual=json.loads(resp.read().decode())
+                  if (actual.get("l7")==expected["l7"]
+                          and actual.get("vigencia")==expected["vigencia"]
+                          and actual.get("publicables")==expected["publicables"]):
+                      print("Web pública sincronizada con L7 #"+str(expected["l7"]))
+                      break
+              except Exception:
+                  pass
+              time.sleep(20)
+          else:
+              raise SystemExit("La L7 se subió a GitHub pero falta confirmar publicación en dominio.")
+          PY
       - name: Resumen de conciliación
         if: steps.export.outputs.update == 'true'
         run: cat "$RUNNER_TEMP/catalogo_report.json" >> "$GITHUB_STEP_SUMMARY"
