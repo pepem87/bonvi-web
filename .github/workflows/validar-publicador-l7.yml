@@ -1,0 +1,22 @@
+name: Validar publicador de L7 aprobada
+on:
+  pull_request:
+    paths:
+      - 'scripts/fetch_approved_snapshot.py'
+      - 'tests/test_approved_snapshot.py'
+      - '.github/workflows/publicar-l7-aprobada.yml'
+      - '.github/workflows/validar-publicador-l7.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Testear exportación pública sin conexión real
+        run: python -m unittest discover -s tests -p 'test_approved_snapshot.py' -v
+      - name: Comprobar sintaxis
+        run: python -m py_compile scripts/fetch_approved_snapshot.py
